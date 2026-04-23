@@ -2,865 +2,1214 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>NEXUS // Finance Command Center - Domine Seus Dados</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 (Free Icons) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <meta name="theme-color" content="#050509">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="data:application/manifest+json,{
+      %22name%22:%22NEXUS%20AI%20Marketplace%22,
+      %22short_name%22:%22NEXUS%20AI%22,
+      %22start_url%22:%22.%22,
+      %22display%22:%22standalone%22,
+      %22background_color%22:%22%23050509%22,
+      %22theme_color%22:%22%2300f2ff%22,
+      %22icons%22:[
+        {%22src%22:%22https://cdn-icons-png.flaticon.com/512/1061/1061146.png%22,%22sizes%22:%22192x192%22},
+        {%22src%22:%22https://cdn-icons-png.flaticon.com/512/1061/1061146.png%22,%22sizes%22:%22512x512%22}
+      ]
+    }">
+    <title>NEXUS AI • Marketplace de SLMs | 128+ Modelos | SLM Personalizado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Swiper JS CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/localforage@1.10.0/dist/localforage.min.js"></script>
     <style>
-        /* --- RESET & VARIABLES (Mobile First) --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-dark: #050509;
             --bg-card: #0a0b14;
             --bg-elevated: #0f101a;
             --primary: #00f2ff;
-            --primary-dim: rgba(0, 242, 255, 0.12);
+            --primary-dim: rgba(0, 242, 255, 0.08);
             --secondary: #bc00ff;
-            --secondary-dim: rgba(188, 0, 255, 0.2);
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --danger: #ff3355;
+            --clawpack: #ff6b35;
+            --clawpack-dim: rgba(255, 107, 53, 0.1);
             --text-main: #eef2ff;
             --text-muted: #8e9aaf;
-            --border-subtle: rgba(255, 255, 255, 0.05);
-            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+            --border-subtle: rgba(255, 255, 255, 0.06);
+            --font-sans: 'Inter', system-ui, sans-serif;
             --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --transition: all 0.2s ease;
         }
-
-        body {
-            background: var(--bg-dark);
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            line-height: 1.5;
-            overflow-x: hidden;
+        body.light-theme {
+            --bg-dark: #f0f2f5;
+            --bg-card: #ffffff;
+            --bg-elevated: #f8f9fa;
+            --primary: #0066cc;
+            --secondary: #9900cc;
+            --success: #00a86b;
+            --warning: #ff8c00;
+            --danger: #dc3545;
+            --clawpack: #e85d2e;
+            --text-main: #1a1a2e;
+            --text-muted: #555555;
+            --border-subtle: rgba(0, 0, 0, 0.08);
         }
-
-        /* Typography */
-        h1, h2, h3 {
-            font-weight: 700;
-            letter-spacing: -0.02em;
+        body { background: var(--bg-dark); color: var(--text-main); font-family: var(--font-sans); line-height: 1.5; min-height: 100vh; transition: var(--transition); }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+        .neon { color: var(--primary); }
+        
+        /* Hero Section com explicação SLM */
+        .hero { text-align: center; padding: 3rem 0 2rem 0; }
+        .hero h1 { font-family: var(--font-mono); font-size: 2.5rem; font-weight: 700; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 1rem; }
+        .hero p { font-size: 1rem; color: var(--text-muted); max-width: 650px; margin: 0 auto 1.5rem auto; line-height: 1.6; }
+        .slm-explanation { background: var(--primary-dim); border-radius: 16px; padding: 1rem; max-width: 700px; margin: 1rem auto 0; font-size: 0.8rem; border-left: 3px solid var(--primary); text-align: left; }
+        .slm-explanation i { color: var(--primary); margin-right: 0.5rem; }
+        
+        .hero-stats { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .hero-stat { text-align: center; background: var(--bg-card); padding: 0.5rem 1.2rem; border-radius: 20px; border: 1px solid var(--border-subtle); }
+        .hero-stat-number { font-size: 2rem; font-weight: 700; font-family: var(--font-mono); color: var(--primary); }
+        .hero-stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .free-badge { display: inline-block; background: var(--primary-dim); border: 1px solid var(--primary); color: var(--primary); padding: 0.3rem 1rem; border-radius: 30px; font-size: 0.7rem; font-weight: 600; margin-top: 1rem; }
+        
+        .filters-section { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 1.2rem; margin: 1.5rem 0; }
+        .search-bar { margin-bottom: 1rem; }
+        .search-input { width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 40px; padding: 0.7rem 1.2rem; color: var(--text-main); font-size: 0.8rem; }
+        .search-input:focus { outline: none; border-color: var(--primary); }
+        .categories-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .category-btn { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 30px; padding: 0.4rem 1rem; font-size: 0.7rem; color: var(--text-muted); cursor: pointer; transition: var(--transition); display: inline-flex; align-items: center; gap: 0.3rem; }
+        .category-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .category-btn.active { background: linear-gradient(90deg, var(--primary), var(--secondary)); border-color: transparent; color: white; }
+        .results-info { display: flex; justify-content: space-between; align-items: center; margin: 0.8rem 0; font-size: 0.7rem; color: var(--text-muted); flex-wrap: wrap; gap: 0.5rem; }
+        
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 0.4rem; margin: 1.5rem 0 2rem 0; flex-wrap: wrap; }
+        .page-btn { background: var(--bg-elevated); border: 1px solid var(--border-subtle); border-radius: 8px; padding: 0.4rem 0.8rem; font-size: 0.7rem; font-family: var(--font-mono); color: var(--text-muted); cursor: pointer; transition: var(--transition); min-width: 35px; text-align: center; }
+        .page-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .page-btn.active { background: linear-gradient(90deg, var(--primary), var(--secondary)); border-color: transparent; color: white; }
+        .page-btn.disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        .models-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.2rem; margin: 1rem 0 2rem 0; }
+        .model-card { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 20px; padding: 1.2rem; transition: all 0.2s; cursor: pointer; }
+        .model-card:hover { transform: translateY(-2px); border-color: var(--primary); box-shadow: 0 4px 20px rgba(0,242,255,0.1); }
+        .model-name { font-size: 1rem; font-weight: 700; font-family: var(--font-mono); margin-bottom: 0.3rem; }
+        .model-type { font-size: 0.6rem; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
+        .model-desc { font-size: 0.75rem; color: var(--text-muted); margin: 0.6rem 0; line-height: 1.4; }
+        .model-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 0.8rem; font-size: 0.65rem; }
+        .model-params { background: var(--bg-elevated); padding: 0.2rem 0.5rem; border-radius: 12px; font-family: var(--font-mono); }
+        .model-cost { color: var(--warning); font-weight: 600; }
+        .deploy-btn { background: var(--primary-dim); border: 1px solid var(--primary); padding: 0.25rem 0.8rem; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: 0.2s; color: var(--primary); font-family: var(--font-mono); }
+        .deploy-btn:hover { background: var(--primary); color: #000; }
+        
+        /* Estilos para o formulário SLM Personalizado */
+        .custom-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
         }
-
-        .neon-text {
-            color: var(--primary);
-            text-shadow: 0 0 5px var(--primary-dim);
-            font-family: var(--font-mono);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
-
-        /* --- HEADER & MOBILE MENU (Hamburger) --- */
-        header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(5, 5, 9, 0.92);
-            backdrop-filter: blur(12px);
-            z-index: 1000;
-            border-bottom: 1px solid var(--border-subtle);
-            padding: 1rem 0;
-        }
-
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-            padding: 0 1.5rem;
-        }
-
-        .logo {
-            font-size: 1.4rem;
-            font-weight: 700;
-            font-family: var(--font-mono);
-            letter-spacing: -1px;
-        }
-
-        /* Menu Desktop */
-        .nav-menu {
-            display: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: 0.2s;
-            text-decoration: none;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .btn-small {
-            background: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            padding: 0.5rem 1.2rem;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-small:hover {
-            background: var(--primary);
-            color: var(--bg-dark);
-            box-shadow: 0 0 12px var(--primary);
-        }
-
-        /* Hamburger Button */
-        .hamburger {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            z-index: 1001;
-        }
-
-        .hamburger span {
-            width: 28px;
-            height: 2px;
-            background: var(--primary);
-            transition: 0.3s;
-            border-radius: 2px;
-        }
-
-        /* Mobile Menu Overlay */
-        .mobile-menu {
-            position: fixed;
-            top: 0;
-            right: -100%;
-            width: 75%;
-            max-width: 300px;
-            height: 100vh;
-            background: rgba(5, 5, 9, 0.98);
-            backdrop-filter: blur(20px);
-            z-index: 999;
-            padding: 5rem 2rem 2rem;
-            transition: right 0.35s ease;
-            box-shadow: -5px 0 30px rgba(0,0,0,0.6);
-            border-left: 1px solid var(--border-subtle);
-        }
-
-        .mobile-menu.active {
-            right: 0;
-        }
-
-        .mobile-menu ul {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 1.8rem;
-        }
-
-        .mobile-menu a {
-            color: var(--text-main);
-            font-size: 1.2rem;
-            font-family: var(--font-mono);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .mobile-menu a:hover {
-            color: var(--primary);
-        }
-
-        .mobile-btn {
-            margin-top: 2rem;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            border: none;
-            padding: 0.8rem;
-            width: 100%;
-            border-radius: 8px;
-            font-weight: bold;
-            color: white;
-            font-family: var(--font-mono);
-            cursor: pointer;
-        }
-
-        /* Language Toggle */
-        .lang-toggle {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-subtle);
-            border-radius: 40px;
-            padding: 0.3rem 0.7rem;
-            font-size: 0.7rem;
-            font-family: var(--font-mono);
-            cursor: pointer;
-            color: var(--text-muted);
-            margin-left: 1rem;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 8rem 0 4rem;
-            position: relative;
-        }
-
-        .hero-bg-pattern {
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(var(--primary-dim) 1px, transparent 1px);
-            background-size: 40px 40px;
-            opacity: 0.25;
-            pointer-events: none;
-        }
-
-        .hero-tagline {
-            font-family: var(--font-mono);
-            color: var(--secondary);
-            font-size: 0.8rem;
-            letter-spacing: 1px;
-            display: inline-block;
-            margin-bottom: 1rem;
-        }
-
-        .hero h1 {
-            font-size: 2.5rem;
-            line-height: 1.2;
-            margin-bottom: 1rem;
-        }
-
-        .hero p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            max-width: 600px;
-            margin-bottom: 2rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            color: white;
-            border: none;
-            padding: 0.9rem 2rem;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 4px 12px rgba(188,0,255,0.3);
-            font-family: var(--font-mono);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(188,0,255,0.4);
-        }
-
-        /* Carrossel de Mockups (Swiper) */
-        .mockup-carousel {
-            margin-top: 3rem;
-            position: relative;
-            padding-bottom: 2rem;
-        }
-
-        .swiper {
-            width: 100%;
-            padding: 0.5rem 0 2rem;
-            overflow: visible;
-        }
-
-        .swiper-slide {
+        .custom-form-card {
             background: var(--bg-card);
-            border-radius: 20px;
-            overflow: hidden;
             border: 1px solid var(--border-subtle);
-            transition: 0.3s;
-            height: auto;
-        }
-
-        .swiper-slide img {
-            width: 100%;
-            height: 220px;
-            object-fit: cover;
-            display: block;
-        }
-
-        .slide-label {
-            padding: 1rem;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--primary);
-            border-top: 1px solid var(--border-subtle);
-            background: var(--bg-elevated);
-            text-align: center;
-        }
-
-        /* Custom Swiper Navigation */
-        .swiper-button-next,
-        .swiper-button-prev {
-            color: var(--primary);
-            background: rgba(0,0,0,0.5);
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            backdrop-filter: blur(4px);
-        }
-        .swiper-button-next:after,
-        .swiper-button-prev:after {
-            font-size: 1.2rem;
-        }
-        .swiper-pagination-bullet {
-            background: var(--text-muted);
-        }
-        .swiper-pagination-bullet-active {
-            background: var(--primary);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 5rem 0;
-            background: var(--bg-card);
-        }
-
-        .section-title {
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        /* Features em Grid (desktop) e Carrossel mobile */
-        .features-desktop-grid {
-            display: none;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.8rem;
-        }
-
-        .features-carousel-mobile {
-            display: block;
-        }
-
-        .feature-card {
-            background: var(--bg-dark);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 1px solid var(--border-subtle);
-            height: 100%;
-        }
-
-        .feature-icon {
-            font-size: 2rem;
-            font-family: var(--font-mono);
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        /* Pricing */
-        .pricing {
-            padding: 5rem 0;
-        }
-
-        .price-box {
-            background: var(--bg-card);
-            padding: 2rem;
             border-radius: 24px;
-            border: 2px solid var(--secondary);
-            text-align: center;
-            max-width: 500px;
-            margin: 0 auto;
-            position: relative;
+            padding: 1.8rem;
         }
-
-        .price-tag {
-            position: absolute;
-            top: -12px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--secondary);
-            padding: 0.2rem 1rem;
-            border-radius: 40px;
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+        .form-group .required {
+            color: var(--danger);
+            margin-left: 0.2rem;
+        }
+        .form-group .hint {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        .form-group .example {
             font-size: 0.7rem;
+            color: var(--primary);
+            background: var(--primary-dim);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 0.3rem;
+        }
+        .custom-textarea {
+            width: 100%;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 0.9rem;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            resize: vertical;
+            transition: all 0.2s;
+        }
+        .custom-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-dim);
+        }
+        .options-grid-custom {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .option-card-custom {
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--bg-elevated);
+        }
+        .option-card-custom:hover {
+            border-color: var(--primary);
+            background: var(--primary-dim);
+            transform: translateY(-2px);
+        }
+        .option-card-custom.selected {
+            border-color: var(--primary);
+            background: var(--primary-dim);
+            box-shadow: 0 0 0 2px rgba(0, 242, 255, 0.3);
+        }
+        .option-emoji {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+        .option-title {
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .option-desc {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+        }
+        .btn-submit-custom {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 0.9rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
             font-family: var(--font-mono);
         }
-
-        .price-value {
-            font-size: 3.5rem;
-            font-weight: 800;
+        .btn-submit-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 242, 255, 0.3);
+        }
+        .info-note {
+            text-align: center;
+            margin-top: 0.8rem;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        .sidebar-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .steps-list {
+            list-style: none;
+        }
+        .steps-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.75rem;
+        }
+        .step-number {
+            width: 22px;
+            height: 22px;
+            background: var(--primary);
+            color: #000;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+        .testimonial {
+            font-size: 0.7rem;
+            font-style: italic;
+            color: var(--text-muted);
+            border-left: 2px solid var(--primary);
+            padding-left: 0.8rem;
             margin: 1rem 0;
         }
-
-        .price-features {
-            list-style: none;
-            margin: 2rem 0;
-            text-align: left;
+        .playground-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.8rem;
         }
-
-        .price-features li {
-            margin-bottom: 0.8rem;
-            color: var(--text-muted);
+        .playground-tag {
+            background: var(--primary-dim);
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
         }
-
-        .price-features li i {
-            color: var(--primary);
-            margin-right: 0.6rem;
+        code {
+            background: var(--bg-elevated);
+            display: block;
+            padding: 0.5rem;
+            border-radius: 12px;
+            font-size: 0.65rem;
+            font-family: monospace;
         }
-
-        footer {
-            text-align: center;
-            padding: 2rem;
-            border-top: 1px solid var(--border-subtle);
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            font-family: var(--font-mono);
-        }
-
-        /* Desktop Responsive */
-        @media (min-width: 768px) {
-            .container {
-                padding: 0 2rem;
-            }
-            .hero h1 {
-                font-size: 4rem;
-            }
-            .hero p {
-                font-size: 1.2rem;
-            }
-            .features-desktop-grid {
-                display: grid;
-            }
-            .features-carousel-mobile {
-                display: none;
-            }
-            .mockup-carousel .swiper {
-                padding: 0.5rem 1rem 2rem;
-            }
-            .nav-menu {
-                display: flex;
-            }
-            .hamburger {
-                display: none;
-            }
-            .mobile-menu {
-                display: none;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .btn-small {
-                display: none;
-            }
-            .header-container .lang-toggle {
-                margin-right: 0.5rem;
-            }
-        }
+        
+        .clawpack-section { background: linear-gradient(135deg, var(--clawpack-dim), var(--primary-dim)); border: 1px solid var(--clawpack); border-radius: 16px; padding: 1.2rem; margin: 1rem 0; }
+        .clawpack-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+        .clawpack-badge { background: var(--clawpack); color: white; padding: 0.2rem 0.8rem; border-radius: 30px; font-size: 0.65rem; font-weight: bold; }
+        .clawpack-points { font-size: 1.3rem; font-weight: bold; color: var(--clawpack); }
+        .clawpack-btn { background: var(--clawpack); border: none; padding: 0.4rem 0.8rem; border-radius: 30px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; transition: var(--transition); }
+        .clawpack-btn:hover { transform: scale(1.02); }
+        
+        .panel { background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1.2rem; margin-bottom: 1.5rem; }
+        .panel-title { font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .stats-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .stat-card { flex: 1; min-width: 100px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 0.8rem; text-align: center; position: relative; overflow: hidden; }
+        .stat-card::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--primary); animation: scanLine 3s infinite linear; opacity: 0.5; }
+        @keyframes scanLine { 0% { top: 0; } 100% { top: 100%; } }
+        .stat-number { font-size: 1.5rem; font-weight: 700; font-family: var(--font-mono); }
+        .stat-label-sm { font-size: 0.6rem; text-transform: uppercase; color: var(--text-muted); }
+        .transactions-list { max-height: 300px; overflow-y: auto; }
+        .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 0.6rem 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.7rem; flex-wrap: wrap; gap: 0.5rem; }
+        .token-badge { background: linear-gradient(135deg, #00f2ff10, #bc00ff10); border: 1px solid var(--primary); border-radius: 20px; padding: 0.5rem; font-family: var(--font-mono); font-size: 0.7rem; text-align: center; margin-top: 1rem; }
+        
+        .btn-primary { background: linear-gradient(90deg, var(--primary), var(--secondary)); border: none; font-weight: 600; cursor: pointer; color: white; padding: 0.6rem 1.2rem; border-radius: 10px; transition: opacity 0.2s; font-family: var(--font-mono); font-size: 0.8rem; width: 100%; }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-secondary { background: transparent; border: 1px solid var(--primary); cursor: pointer; padding: 0.5rem 1rem; border-radius: 10px; color: var(--primary); transition: all 0.2s; font-family: var(--font-mono); font-size: 0.75rem; }
+        .btn-secondary:hover { background: var(--primary-dim); }
+        .btn-danger { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #000; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(8px); }
+        .modal-content { background: var(--bg-card); border: 1px solid var(--primary); border-radius: 24px; max-width: 550px; width: 90%; padding: 1.8rem; position: relative; animation: modalFadeIn 0.3s ease; max-height: 85vh; overflow-y: auto; }
+        @keyframes modalFadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; transition: 0.2s; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: var(--danger); color: white; }
+        .modal-title { font-family: var(--font-mono); font-size: 1.2rem; margin-bottom: 0.5rem; color: var(--primary); }
+        .modal-body { font-size: 0.9rem; color: var(--text-muted); margin: 1rem 0; line-height: 1.6; }
+        .modal-detail { display: flex; justify-content: space-between; padding: 0.6rem 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.85rem; }
+        .modal-buttons { display: flex; gap: 1rem; margin-top: 1.5rem; }
+        .modal-buttons button { flex: 1; }
+        
+        .loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #0a0b14 0%, #050509 100%); z-index: 3000; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease; }
+        body.light-theme .loading-overlay { background: radial-gradient(ellipse at center, #e0e0e0 0%, #cccccc 100%); }
+        .loading-overlay.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        .loading-glitch { font-family: var(--font-mono); font-size: 2rem; color: var(--primary); animation: loadingPulse 1.5s infinite; margin-bottom: 1rem; }
+        @keyframes loadingPulse { 0%,100% { opacity: 1; text-shadow: 0 0 5px var(--primary); } 50% { opacity: 0.6; text-shadow: 0 0 20px var(--primary); } }
+        .loading-spinner { width: 48px; height: 48px; border: 2px solid var(--border-subtle); border-top: 2px solid var(--primary); border-radius: 50%; animation: loadingSpin 1s linear infinite; margin: 1rem 0; }
+        @keyframes loadingSpin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-progress { width: 250px; height: 2px; background: var(--border-subtle); border-radius: 2px; margin-top: 1rem; overflow: hidden; }
+        .loading-progress-bar { width: 0%; height: 100%; background: var(--primary); transition: width 0.3s ease; }
+        .loading-text { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem; letter-spacing: 2px; }
+        
+        .login-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(ellipse at center, #0a0b14 0%, #050509 100%); z-index: 1500; display: flex; justify-content: center; align-items: center; transition: opacity 0.5s ease; opacity: 1; }
+        body.light-theme .login-container { background: radial-gradient(ellipse at center, #e0e0e0 0%, #cccccc 100%); }
+        .login-container.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+        .login-box { background: var(--bg-card); border: 1px solid var(--primary); border-radius: 20px; padding: 1.5rem; width: 90%; max-width: 400px; box-shadow: 0 0 30px rgba(0, 242, 255, 0.15); }
+        .login-box h2 { font-family: var(--font-mono); color: var(--primary); text-align: center; margin-bottom: 0.3rem; font-size: 1.1rem; }
+        .login-subtitle { text-align: center; color: var(--text-muted); font-size: 0.7rem; margin-bottom: 1.2rem; }
+        .login-input { width: 100%; background: var(--bg-elevated); border: 1px solid var(--border-subtle); padding: 0.7rem; border-radius: 10px; color: var(--text-main); margin-bottom: 0.8rem; font-family: var(--font-mono); font-size: 0.8rem; }
+        .login-input:focus { outline: none; border-color: var(--primary); }
+        .login-btn { width: 100%; background: linear-gradient(90deg, var(--primary), var(--secondary)); border: none; padding: 0.7rem; border-radius: 10px; color: white; font-weight: 700; cursor: pointer; font-family: var(--font-mono); font-size: 0.85rem; }
+        .login-error { color: var(--danger); font-size: 0.75rem; text-align: center; margin-top: 0.8rem; }
+        
+        .pwa-banner { position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #00f2ff, #bc00ff); color: #000; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; z-index: 1100; font-family: var(--font-mono); font-weight: 600; flex-wrap: wrap; gap: 10px; font-size: 0.75rem; }
+        .pwa-banner.hide-banner { display: none !important; }
+        .install-btn { background: #000; color: #00f2ff; border: none; padding: 4px 12px; border-radius: 30px; font-weight: bold; cursor: pointer; font-family: var(--font-mono); font-size: 0.7rem; }
+        .close-banner { background: rgba(0,0,0,0.3); color: #000; font-size: 1rem; cursor: pointer; padding: 2px 8px; border: none; border-radius: 50%; }
+        
+        .main-app { display: none; }
+        .main-app.visible { display: block; }
+        .header { position: sticky; top: 0; background: rgba(5, 5, 9, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-subtle); padding: 0.5rem 0; z-index: 100; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+        .logo { font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; color: var(--primary); cursor: pointer; white-space: nowrap; }
+        
+        .desktop-nav { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+        .desktop-nav-item { display: flex; align-items: center; gap: 0.3rem; background: var(--bg-elevated); padding: 0.3rem 0.7rem; border-radius: 30px; cursor: pointer; transition: var(--transition); font-family: var(--font-mono); font-size: 0.65rem; border: 1px solid var(--border-subtle); white-space: nowrap; }
+        .desktop-nav-item:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-dim); }
+        .desktop-nav-item i { color: var(--primary); font-size: 0.7rem; }
+        
+        .user-info { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-mono); font-size: 0.65rem; flex-wrap: wrap; }
+        .status-badge { background: var(--success); color: #000; padding: 0.15rem 0.4rem; border-radius: 20px; font-size: 0.55rem; font-weight: 600; white-space: nowrap; }
+        .token-display { background: var(--bg-elevated); border-radius: 20px; padding: 0.15rem 0.5rem; font-family: var(--font-mono); font-size: 0.65rem; border: 1px solid var(--primary); white-space: nowrap; }
+        
+        .hamburger { display: flex; flex-direction: column; gap: 3px; background: none; border: none; cursor: pointer; z-index: 200; }
+        .hamburger span { width: 18px; height: 2px; background: var(--primary); transition: 0.3s; }
+        .side-menu { position: fixed; top: 0; left: -260px; width: 260px; height: 100vh; background: var(--bg-card); border-right: 1px solid var(--border-subtle); z-index: 300; transition: left 0.3s ease; padding: 4rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.3rem; overflow-y: auto; }
+        .side-menu.open { left: 0; }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 299; display: none; }
+        .menu-overlay.open { display: block; }
+        .menu-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.6rem; border-radius: 8px; cursor: pointer; font-family: var(--font-mono); font-size: 0.8rem; transition: 0.2s; }
+        .menu-item:hover { background: var(--primary-dim); }
+        .menu-item i { width: 22px; color: var(--primary); }
+        
+        .footer { background: var(--bg-card); border-top: 1px solid var(--border-subtle); margin-top: 2rem; }
+        .footer-desktop { display: block; padding: 2rem 0 1.5rem 0; }
+        .footer-mobile { display: none; padding: 1rem 0; }
+        .footer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-bottom: 1.5rem; }
+        .footer-section h4 { font-family: var(--font-mono); font-size: 0.7rem; color: var(--primary); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 1px; }
+        .footer-section ul { list-style: none; }
+        .footer-section ul li { margin-bottom: 0.3rem; }
+        .footer-section a { color: var(--text-muted); text-decoration: none; font-size: 0.65rem; transition: var(--transition); cursor: pointer; }
+        .footer-section a:hover { color: var(--primary); }
+        .footer-social { display: flex; gap: 0.6rem; margin-top: 0.3rem; flex-wrap: wrap; }
+        .footer-social a { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; transition: var(--transition); color: var(--text-muted); font-size: 0.7rem; }
+        .footer-social a:hover { background: var(--primary); color: #000; transform: translateY(-2px); }
+        .footer-bottom { text-align: center; font-size: 0.6rem; color: var(--text-muted); padding-top: 1rem; border-top: 1px solid var(--border-subtle); }
+        .footer-mobile .footer-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin-bottom: 0.6rem; }
+        .footer-mobile .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.65rem; }
+        .footer-mobile .footer-social { justify-content: center; margin-bottom: 0.6rem; }
+        .footer-mobile .footer-bottom { font-size: 0.55rem; padding-top: 0.6rem; margin-top: 0; }
+        
+        @media (max-width: 900px) { .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; } }
+        @media (max-width: 1000px) { .desktop-nav-item { padding: 0.25rem 0.5rem; font-size: 0.6rem; } .desktop-nav-item i { font-size: 0.65rem; } .logo { font-size: 0.75rem; } }
+        @media (max-width: 850px) { .header-content { flex-direction: column; align-items: stretch; } .desktop-nav { justify-content: center; order: 2; } .user-info { justify-content: space-between; order: 1; } .logo { text-align: center; } }
+        @media (max-width: 768px) { .desktop-nav { display: none; } .hamburger { display: flex; } .footer-desktop { display: none; } .footer-mobile { display: block; } .header-content { flex-direction: row; align-items: center; } .user-info { order: 2; } .logo { order: 1; text-align: left; } .custom-form-grid { grid-template-columns: 1fr; } .options-grid-custom { grid-template-columns: 1fr; } }
+        @media (min-width: 769px) { .hamburger { display: none; } .side-menu { display: none; } .menu-overlay { display: none; } .footer-desktop { display: block; } .footer-mobile { display: none; } }
+        @media (max-width: 640px) { .container { padding: 0 1rem; } .hero h1 { font-size: 1.8rem; } .hero-stats { gap: 0.8rem; } .hero-stat-number { font-size: 1.5rem; } .models-grid { grid-template-columns: 1fr; } .user-info { gap: 0.4rem; } .token-display { font-size: 0.55rem; } .status-badge { font-size: 0.5rem; } }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="header-container">
-        <a href="#" class="logo neon-text">NEXUS//FINANCE</a>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="lang-toggle" id="langToggleBtn">
-                <i class="fas fa-globe"></i> PT/EN
-            </div>
-            <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
-                <span></span><span></span><span></span>
-            </button>
-            <div class="nav-menu">
-                <ul class="nav-links">
-                    <li><a href="#features" data-key="nav_features">Recursos</a></li>
-                    <li><a href="#pricing" data-key="nav_pricing">Preço</a></li>
-                    <li><a href="#" data-key="nav_support">Suporte</a></li>
-                </ul>
-                <button class="btn-small" id="desktopCta" data-key="btn_download">BAIXAR AGORA</button>
-            </div>
-        </div>
+<div class="loading-overlay" id="initialLoading">
+    <div class="loading-glitch">NEXUS//AI</div>
+    <div class="loading-spinner"></div>
+    <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar1"></div></div>
+    <div class="loading-text" id="loadingStatus1">INICIALIZANDO SISTEMA...</div>
+</div>
+
+<div class="login-container" id="loginContainer">
+    <div class="login-box">
+        <h2><i class="fas fa-brain"></i> NEXUS AI MARKETPLACE</h2>
+        <div class="login-subtitle" id="loginSubtitle">Small Language Models for Business</div>
+        <input type="text" id="loginUser" class="login-input" placeholder="Usuário" value="nexus_user">
+        <input type="password" id="loginPass" class="login-input" placeholder="Senha" value="nexus2026">
+        <button class="login-btn" id="loginBtn"><i class="fas fa-gem"></i> <span id="loginBtnText">CRIAR CONTA • 100M TOKENS GRÁTIS</span></button>
+        <div id="loginError" class="login-error"></div>
+        <div class="token-badge" id="loginTokenBadge"><i class="fas fa-coins"></i> <span id="loginTokenText">PLANO 0 • 100 MILHÕES DE TOKENS GRÁTIS NO CADASTRO</span></div>
+        <p style="text-align: center; margin-top: 0.8rem; font-size: 0.6rem; color: var(--text-muted);" id="loginHint">🔬 Qualquer usuário/senha cria conta com 100M tokens</p>
+    </div>
+</div>
+
+<div class="loading-overlay" id="secondLoading" style="z-index: 2500; display: none;">
+    <div class="loading-glitch">CARREGANDO...</div>
+    <div class="loading-spinner"></div>
+    <div class="loading-progress"><div class="loading-progress-bar" id="loadingProgressBar2"></div></div>
+    <div class="loading-text" id="loadingStatus2">PREPARANDO MARKETPLACE...</div>
+</div>
+
+<div class="main-app" id="mainApp">
+    <div id="pwaBanner" class="pwa-banner">
+        <div><i class="fas fa-mobile-alt"></i> <span id="bannerText">INSTALE O NEXUS AI MARKETPLACE • 128+ modelos</span></div>
+        <div><button id="installAppBtn" class="install-btn"><span id="installBtnText">INSTALAR</span></button><button id="closeBannerBtn" class="close-banner">✕</button></div>
     </div>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-menu" id="mobileMenu">
-        <ul>
-            <li><a href="#features" data-key="nav_features">Recursos</a></li>
-            <li><a href="#pricing" data-key="nav_pricing">Preço</a></li>
-            <li><a href="#" data-key="nav_support">Suporte</a></li>
-        </ul>
-        <button class="mobile-btn" id="mobileCtaBtn" data-key="btn_download_mobile">BAIXAR AGORA →</button>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-item" id="menuBrowse"><i class="fas fa-store"></i> <span id="menuBrowseText">Explorar</span></div>
+        <div class="menu-item" id="menuCustom"><i class="fas fa-microchip"></i> <span id="menuCustomText">SLM Personalizado</span></div>
+        <div class="menu-item" id="menuDashboard"><i class="fas fa-chart-line"></i> <span id="menuDashboardText">Painel</span></div>
+        <div class="menu-item" id="menuDeployed"><i class="fas fa-rocket"></i> <span id="menuDeployedText">Implantados</span></div>
+        <div class="menu-item" id="menuTokens"><i class="fas fa-coins"></i> <span id="menuTokensText">Tokens</span></div>
+        <div class="menu-item" id="menuTheme"><i class="fas fa-moon"></i> <span id="menuThemeText">Tema Claro/Escuro</span></div>
+        <div class="menu-item" id="menuLang"><i class="fas fa-language"></i> <span id="menuLangText">Idioma: Português</span></div>
+        <div class="menu-item" id="menuLogout"><i class="fas fa-sign-out-alt"></i> <span id="menuLogoutText">Sair</span></div>
     </div>
-</header>
+    <div class="menu-overlay" id="menuOverlay"></div>
 
-<main>
-    <!-- Hero Section com Carrossel de Mockups -->
-    <section class="hero">
-        <div class="hero-bg-pattern"></div>
+    <header class="header">
         <div class="container">
-            <span class="hero-tagline" id="heroTagline">// SISTEMA TÁCTICO DE DADOS</span>
-            <h1 id="heroTitle">Cansado de Planilhas <span class="gradient-text">Burras?</span></h1>
-            <p id="heroDesc">Nexus é o Command Center financeiro definitivo. Visualize seu fluxo de caixa, investimentos e ROI com uma interface FUI digna de elite.</p>
-            <button class="btn-primary" id="mainCtaBtn" data-key="btn_main_cta">DOMINE SEUS DADOS POR R$ 47</button>
-
-            <!-- Carrossel de Imagens Unsplash (Swiper) -->
-            <div class="mockup-carousel">
-                <div class="swiper mockupSwiper">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <img src="https://images.pexels.com/photos/7876380/pexels-photo-7876380.jpeg" alt="Dashboard analytics">
-                            <div class="slide-label">⟡ NEXUS ANALYTICS // REAL-TIME</div>
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format" alt="Investment ROI">
-                            <div class="slide-label">⟡ ROI TRACKER // FULL-STACK LOGIC</div>
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=800&auto=format" alt="Accounting Interface">
-                            <div class="slide-label">⟡ TACTICAL FUI // DARK MODE</div>
-                        </div>
-                        <div class="swiper-slide">
-                            <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&auto=format" alt="Finance Charts">
-                            <div class="slide-label">⟡ SMART CHARTS // AI INSIGHTS</div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination"></div>
-                    <div class="swiper-button-next"></div>
-                    <div class="swiper-button-prev"></div>
+            <div class="header-content">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+                    <div class="logo"><i class="fas fa-brain"></i> NEXUS // AI</div>
+                </div>
+                <div class="desktop-nav">
+                    <div class="desktop-nav-item" id="desktopBrowse"><i class="fas fa-store"></i> Models</div>
+                    <div class="desktop-nav-item" id="desktopCustom"><i class="fas fa-microchip"></i> Custom SLM</div>
+                    <div class="desktop-nav-item" id="desktopDashboard"><i class="fas fa-chart-line"></i> Dash</div>
+                    <div class="desktop-nav-item" id="desktopDeployed"><i class="fas fa-rocket"></i> Deployed</div>
+                    <div class="desktop-nav-item" id="desktopTokens"><i class="fas fa-coins"></i> Tokens</div>
+                    <div class="desktop-nav-item" id="desktopTheme"><i class="fas fa-moon"></i> Theme</div>
+                    <div class="desktop-nav-item" id="desktopLang"><i class="fas fa-language"></i> Idioma</div>
+                    <div class="desktop-nav-item" id="desktopLogout"><i class="fas fa-sign-out-alt"></i> Sair</div>
+                </div>
+                <div class="user-info">
+                    <span><i class="fas fa-user-astronaut"></i> <span id="userNameDisplay">User</span></span>
+                    <span class="status-badge"><i class="fas fa-circle" style="font-size: 0.3rem;"></i> <span id="statusText">LIVE</span></span>
+                    <span class="token-display" id="tokenDisplay"><i class="fas fa-coins"></i> <span id="tokenAmount">100,000,000</span> <span id="tokenLabel">tokens</span></span>
                 </div>
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Features Section (Grid Desktop + Carrossel Mobile) -->
-    <section id="features" class="features">
+    <main><div class="container" id="appContainer"></div></main>
+
+    <footer class="footer footer-desktop">
         <div class="container">
-            <h2 class="section-title" id="featuresTitle">Por que você <span class="neon-text">&lt;precisa&gt;</span> disso</h2>
-            
-            <!-- Desktop Grid -->
-            <div class="features-desktop-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">01//</div>
-                    <h3 id="feat1_title">Lógica Full-Stack</h3>
-                    <p id="feat1_desc">Nexus processa dados complexos e gera gráficos de ROI precisos automaticamente. Lógica de dev, visual de designer.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">02//</div>
-                    <h3 id="feat2_title">Interface Táctica FUI</h3>
-                    <p id="feat2_desc">Cansado do visual corporativo branco? Domine suas finanças com design Dark Mode, fontes mono e animações suaves.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">03//</div>
-                    <h3 id="feat3_title">Controle de Freela/VFX</h3>
-                    <p id="feat3_desc">Módulos específicos para calcular custo de hora, ROI de softwares (como render farms) e impostos de importação.</p>
-                </div>
+            <div class="footer-grid">
+                <div class="footer-section"><h4><i class="fas fa-brain"></i> NEXUS AI</h4><ul><li><a href="#" id="aboutLinkDesktop">Sobre Nós</a></li><li><a href="#" id="careersLinkDesktop">Carreiras</a></li><li><a href="#" id="blogLinkDesktop">Blog</a></li><li><a href="#" id="slmInfoLinkDesktop">O que são SLMs?</a></li></ul></div>
+                <div class="footer-section"><h4><i class="fas fa-store"></i> Marketplace</h4><ul><li><a href="#" id="allModelsLinkDesktop">Todos os Modelos</a></li><li><a href="#" id="popularLinkDesktop">Modelos Populares</a></li><li><a href="#" id="requestLinkDesktop">Solicitar Modelo</a></li><li><a href="#" id="howItWorksLinkDesktop">Como Funciona</a></li></ul></div>
+                <div class="footer-section"><h4><i class="fas fa-gavel"></i> Legal</h4><ul><li><a href="#" id="privacyLinkDesktop">Privacidade</a></li><li><a href="#" id="termsLinkDesktop">Termos de Uso</a></li><li><a href="#" id="cookiesLinkDesktop">Cookies</a></li><li><a href="#" id="lgpdLinkDesktop">LGPD</a></li></ul></div>
+                <div class="footer-section"><h4><i class="fas fa-share-alt"></i> Redes Sociais</h4><div class="footer-social"><a href="#"><i class="fab fa-github"></i></a><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-twitter"></i></a><a href="#"><i class="fab fa-discord"></i></a></div></div>
             </div>
-
-            <!-- Mobile Carousel Features -->
-            <div class="features-carousel-mobile">
-                <div class="swiper featuresSwiper">
-                    <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="feature-card">
-                                <div class="feature-icon">01//</div>
-                                <h3 id="feat1_title_mob">Lógica Full-Stack</h3>
-                                <p id="feat1_desc_mob">Nexus processa dados complexos e gera gráficos de ROI precisos automaticamente. Lógica de dev, visual de designer.</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="feature-card">
-                                <div class="feature-icon">02//</div>
-                                <h3 id="feat2_title_mob">Interface Táctica FUI</h3>
-                                <p id="feat2_desc_mob">Cansado do visual corporativo branco? Domine suas finanças com design Dark Mode, fontes mono e animações suaves.</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="feature-card">
-                                <div class="feature-icon">03//</div>
-                                <h3 id="feat3_title_mob">Controle de Freela/VFX</h3>
-                                <p id="feat3_desc_mob">Módulos específicos para calcular custo de hora, ROI de softwares (como render farms) e impostos de importação.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="swiper-pagination features-pagination"></div>
-                </div>
-            </div>
+            <div class="footer-bottom"><p>© 2024 NEXUS AI Marketplace. Todos os direitos reservados.</p><p style="margin-top:0.2rem;">💰 Tokens são apenas para demonstração. Fins educacionais.</p><p style="margin-top:0.2rem;">🤖 SLMs (Small Language Models) são modelos de IA otimizados para tarefas específicas, com até 20B parâmetros.</p></div>
         </div>
-    </section>
+    </footer>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="pricing">
+    <footer class="footer footer-mobile">
         <div class="container">
-            <h2 class="section-title" id="pricingTitle">Acesso Vitalício</h2>
-            <div class="price-box">
-                <span class="price-tag" id="priceBadge">OFERTA LIMITADA</span>
-                <div class="price-value">R$ 47 <span>,00</span></div>
-                <ul class="price-features">
-                    <li><i class="fas fa-code"></i> <span id="price_feat1">Código-fonte Completo (React/HTML/CSS)</span></li>
-                    <li><i class="fas fa-file-alt"></i> <span id="price_feat2">Template Notion "Nexus Pro" Incluído</span></li>
-                    <li><i class="fas fa-rocket"></i> <span id="price_feat3">Guia de Instalação Rápida (SOP)</span></li>
-                    <li><i class="fas fa-sync-alt"></i> <span id="price_feat4">Atualizações Gratuitas para Sempre</span></li>
-                </ul>
-                <button class="btn-primary" id="finalCtaBtn" data-key="final_cta">QUERO O NEXUS AGORA</button>
-            </div>
+            <div class="footer-links"><a href="#" id="aboutLinkMobile">Sobre</a><a href="#" id="privacyLinkMobile">Privacidade</a><a href="#" id="termsLinkMobile">Termos</a><a href="#" id="cookiesLinkMobile">Cookies</a><a href="#" id="slmInfoLinkMobile">SLMs</a></div>
+            <div class="footer-social"><a href="#"><i class="fab fa-github"></i></a><a href="#"><i class="fab fa-linkedin"></i></a><a href="#"><i class="fab fa-twitter"></i></a></div>
+            <div class="footer-bottom"><p>© 2024 NEXUS AI | Tokens demonstração</p><p>🤖 SLMs para tarefas empresariais</p></div>
         </div>
-    </section>
-</main>
+    </footer>
+</div>
 
-<footer>
-    <div class="container">
-        <p>&copy; 2026 NEXUS LABS. Desenhado para Makers por um Maker.</p>
-        <p class="neon-text" style="font-size: 0.7rem; margin-top: 10px;">SYSTEM STATUS: ONLINE</p>
-    </div>
-</footer>
-
-<!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>
-    // Inicializar Swipers
-    const mockupSwiper = new Swiper('.mockupSwiper', {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        loop: true,
-        autoplay: {
-            delay: 4000,
-            disableOnInteraction: false,
-        },
-        pagination: {
-            el: '.swiper-pagination',
-            clickable: true,
-        },
-        navigation: {
-            nextEl: '.swiper-button-next',
-            prevEl: '.swiper-button-prev',
-        },
-        breakpoints: {
-            640: {
-                slidesPerView: 2,
-                spaceBetween: 20,
+    (function() {
+        // LOADING INICIAL
+        const initialLoading = document.getElementById("initialLoading");
+        const loadingProgressBar1 = document.getElementById("loadingProgressBar1");
+        const loadingStatus1 = document.getElementById("loadingStatus1");
+        let progress1 = 0;
+        const interval1 = setInterval(() => {
+            progress1 += 25;
+            if (loadingProgressBar1) loadingProgressBar1.style.width = progress1 + "%";
+            if (loadingStatus1 && progress1 <= 100) loadingStatus1.innerText = ["INICIALIZANDO...","CARREGANDO IA...","CONECTANDO...","PRONTO!"][Math.floor(progress1/25)];
+            if (progress1 >= 100) { clearInterval(interval1); setTimeout(() => { initialLoading.classList.add("hide"); setTimeout(() => { initialLoading.style.display = "none"; }, 500); }, 200); }
+        }, 750);
+        
+        // CONFIGURAÇÕES GLOBAIS
+        const db = localforage.createInstance({ name: "NexusMarketplace", storeName: "user_data" });
+        let userTokens = 100000000, clawpackPoints = 500, currentUser = null, deployedModels = [], modelUsageHistory = [], clawpackHistory = [], deferredPrompt = null, currentLang = "pt", currentCategory = "all", currentSearch = "", currentPage = 1;
+        const itemsPerPage = 9;
+        
+        // PLANOS
+        const plans = { plan1: { name: "ESSENTIAL", priceBRL: 45, priceUSD: 9, tokens: 50000000, bonus: 0, points: 450 }, plan2: { name: "PRO", priceBRL: 150, priceUSD: 15, tokens: 150000000, bonus: 25000000, points: 1500 } };
+        
+        // CATEGORIAS
+        const categories = [{ id: "all", name: "Todos", icon: "📋" },{ id: "finance", name: "Finanças", icon: "💰" },{ id: "crypto", name: "Crypto", icon: "₿" },{ id: "risk", name: "Risco", icon: "⚠️" },{ id: "security", name: "Segurança", icon: "🔒" },{ id: "trading", name: "Trading", icon: "📈" },{ id: "economics", name: "Economia", icon: "🏦" },{ id: "quant", name: "Quant", icon: "📊" },{ id: "nlp", name: "NLP", icon: "💬" }];
+        
+        // MODELOS (128+)
+        const modelCatalog = [
+            { id: "finance-predict", name: "FinancePredict SLM", type: "Task SLM", params: "1.2B", desc: "Previsão de tendências de mercado e análise financeira com 97% de acurácia", longDesc: "<strong>🔍 Especialização:</strong> Previsão de movimentos de mercado, análise de séries temporais e indicadores econômicos.<br><br><strong>🎯 Ideal para:</strong> Traders, analistas financeiros, gestores de fundos e investidores.<br><br><strong>📊 Performance:</strong> 97.3% de acurácia em testes com dados históricos de 10 anos.<br><br><strong>⚡ Características:</strong> Processa dados em tempo real, identifica padrões complexos, gera sinais de compra/venda com confiança estatística.", cost: 1000, category: "finance", accuracy: "97.3%" },
+            { id: "sentiment-trader", name: "SentimentTrader", type: "Task SLM", params: "890M", desc: "Análise de sentimento de mercado de notícias e redes sociais", longDesc: "<strong>🔍 Especialização:</strong> Processamento de linguagem natural para análise de sentimento em tempo real.<br><br><strong>🎯 Ideal para:</strong> Analistas de mercado, equipes de marketing, gestores de risco.<br><br><strong>📊 Performance:</strong> 94.8% de precisão na classificação de sentimento (positivo/neutro/negativo).<br><br><strong>⚡ Características:</strong> Monitora milhares de fontes simultaneamente, detecta crises de reputação antecipadamente, gera alertas automáticos.", cost: 800, category: "finance", accuracy: "94.8%" },
+            { id: "risk-analyzer", name: "RiskAnalyzer", type: "General", params: "7B", desc: "Avaliação de risco de portfólio e previsão de volatilidade", longDesc: "<strong>🔍 Especialização:</strong> Análise de risco financeiro, cálculo de VaR (Value at Risk) e estresse de portfólio.<br><br>🎯 Ideal para: Gestores de risco, CFOs, compliance officers.<br><br>📊 Performance: 96.2% de confiabilidade em cenários de mercado adversos.<br><br>⚡ Características: Simula milhares de cenários, calcula métricas de risco em tempo real, sugere alocações otimizadas.", cost: 2500, category: "risk", accuracy: "96.2%" },
+            { id: "earnings-forecast", name: "EarningsForecaster", type: "Task SLM", params: "450M", desc: "Previsão de lucros trimestrais para ações", longDesc: "<strong>🔍 Especialização:</strong> Previsão de resultados financeiros de empresas de capital aberto.<br><br>🎯 Ideal para: Investidores institucionais, analistas sell-side, fundos de hedge.<br><br>📊 Performance: 91.5% de acurácia em previsões trimestrais.<br><br>⚡ Características: Analisa balanços, projeções de mercado e indicadores macroeconômicos.", cost: 600, category: "finance", accuracy: "91.5%" },
+            { id: "crypto-signal", name: "CryptoSignal AI", type: "General", params: "13B", desc: "Previsão de movimento de preços de criptomoedas", longDesc: "<strong>🔍 Especialização:</strong> Análise de mercado cripto, detecção de padrões on-chain e whale movements.<br><br>🎯 Ideal para: Traders de criptomoedas, fundos de investimento em blockchain.<br><br>📊 Performance: 88.9% de acurácia em previsões de 24h.<br><br>⚡ Características: Monitora mempool, analisa fluxo de grandes investidores, gera sinais de entrada/saída.", cost: 3000, category: "crypto", accuracy: "88.9%" },
+            { id: "fraud-detection", name: "FraudDetector", type: "Task SLM", params: "680M", desc: "Detecção de fraudes em transações em tempo real", longDesc: "<strong>🔍 Especialização:</strong> Identificação de transações fraudulentas e comportamentos suspeitos.<br><br>🎯 Ideal para: Instituições financeiras, e-commerces, fintechs.<br><br>📊 Performance: 99.1% de precisão com 0.3% de falsos positivos.<br><br>⚡ Características: Processa milhares de transações por segundo, adapta-se a novos padrões de fraude, reduz chargebacks.", cost: 1200, category: "security", accuracy: "99.1%" },
+            { id: "portfolio-optim", name: "PortfolioOptimizer", type: "Task SLM", params: "520M", desc: "Alocação de ativos e otimização de portfólio", longDesc: "<strong>🔍 Especialização:</strong> Otimização de carteiras de investimento usando fronteira eficiente de Markowitz.<br><br>🎯 Ideal para: Wealth managers, consultores financeiros, investidores.<br><br>📊 Performance: 93.4% de eficiência na alocação sugerida.<br><br>⚡ Características: Considera correlações entre ativos, otimiza retorno para dado nível de risco, rebalanceia automaticamente.", cost: 900, category: "finance", accuracy: "93.4%" },
+            { id: "options-pricing", name: "OptionsPricer", type: "Task SLM", params: "350M", desc: "Precificação de opções e cálculo de gregas", longDesc: "<strong>🔍 Especialização:</strong> Precificação de opções usando Black-Scholes e Monte Carlo.<br><br>🎯 Ideal para: Traders de derivativos, mesas de operações, gestores de risco.<br><br>📊 Performance: 95.2% de precisão em comparação com mercado real.<br><br>⚡ Características: Calcula delta, gamma, theta, vega, rho; simula cenários de volatilidade.", cost: 700, category: "finance", accuracy: "95.2%" }
+        ];
+        
+        const allCategories = ["finance","crypto","risk","security","trading","economics","quant","nlp"];
+        const types = ["Task SLM", "General"];
+        for (let i = modelCatalog.length + 1; i <= 128; i++) {
+            const cat = allCategories[Math.floor(Math.random() * allCategories.length)];
+            const catName = categories.find(c => c.id === cat)?.name || "negócios";
+            modelCatalog.push({ 
+                id: `model-${i}`, 
+                name: `SLM-${Math.floor(Math.random() * 9000 + 1000)}`, 
+                type: types[Math.floor(Math.random() * types.length)], 
+                params: `${(Math.random() * 15 + 0.1).toFixed(1)}B`, 
+                desc: `Modelo especializado para ${catName} - análise preditiva e otimização de processos empresariais`, 
+                longDesc: `<strong>🔍 Especialização:</strong> Processamento inteligente de dados específicos do setor de ${catName}.<br><br><strong>🎯 Ideal para:</strong> Empresas que buscam automação inteligente em suas operações diárias.<br><br><strong>📊 Performance:</strong> ${(Math.random() * 10 + 85).toFixed(1)}% de acurácia em testes de validação.<br><br><strong>⚡ Características:</strong> Baixa latência, otimizado para inferência rápida, consumo eficiente de tokens.`,
+                cost: Math.floor(Math.random() * 3000) + 300, 
+                category: cat,
+                accuracy: `${(Math.random() * 10 + 85).toFixed(1)}%`
+            });
+        }
+        
+        // TRADUÇÕES
+        const texts = {
+            pt: { 
+                loginSubtitle: "Small Language Models for Business", 
+                loginBtnText: "CRIAR CONTA • 100M TOKENS GRÁTIS", 
+                loginTokenText: "PLANO 0 • 100M TOKENS", 
+                loginHint: "🔬 Qualquer usuário/senha cria conta", 
+                bannerText: "INSTALE NEXUS AI • 128+ modelos", 
+                installBtnText: "INSTALAR", 
+                menuBrowse: "Explorar", 
+                menuCustom: "SLM Personalizado", 
+                menuDashboard: "Painel", 
+                menuDeployed: "Implantados", 
+                menuTokens: "Tokens", 
+                menuTheme: "Tema", 
+                menuLang: "Idioma: Português", 
+                menuLogout: "Sair", 
+                statusText: "LIVE", 
+                tokenLabel: "tokens", 
+                heroTitle: "Small Language Models, Grande Impacto", 
+                heroDesc: "Descubra SLMs (Small Language Models) otimizados para tarefas empresariais específicas. Modelos com até 20B parâmetros que rodam localmente com baixa latência e alto desempenho.", 
+                slmExplanation: "🤖 O que são SLMs? São modelos de linguagem compactos (até 20B parâmetros) que oferecem desempenho superior para tarefas específicas, com menor custo e maior velocidade que LLMs tradicionais.",
+                freeBadge: "✨ Navegação gratuita — Pague apenas pela inferência", 
+                browseTitle: "Explorar Modelos Disponíveis", 
+                customTitle: "🧠 Construa seu SLM Personalizado", 
+                customDesc: "Descreva o que você precisa em linguagem simples. Geraremos dados sintéticos, avaliaremos modelos base, ajustaremos e entregaremos um modelo otimizado para sua tarefa.",
+                customPlaceholder: "Ex: classificar chamados de suporte por urgência (baixa, média, alta)", 
+                customBtn: "Enviar Solicitação (2.500 tokens)", 
+                deployedTitle: "Meus Modelos Implantados", 
+                noModels: "Nenhum modelo implantado ainda. Explore o marketplace e implante seu primeiro SLM!", 
+                tokensAvailable: "tokens disponíveis", 
+                tokenWarning: "Plano 0 - 100M tokens gratuitos para teste", 
+                noUsage: "Nenhum consumo registrado ainda. Comece implantando um modelo!", 
+                noActivity: "Nenhuma atividade recente. Suas ações aparecerão aqui.", 
+                deployedAt: "Implantado em", 
+                removeBtn: "Remover", 
+                deployBtn: "Implantar", 
+                modalDeploy: "Implantar Modelo", 
+                modalConfirmTitle: "Confirmar Implantação", 
+                modalConfirmDesc: "Tem certeza que deseja implantar este modelo? O custo será descontado dos seus tokens e o modelo ficará disponível em sua área 'Deployed'.", 
+                modalSuccessTitle: "Sucesso!", 
+                modalErrorTitle: "Erro", 
+                insufficientTokens: "❌ Tokens insuficientes! Adquira um plano para continuar.", 
+                deployedAlert: "✅ Modelo implantado com sucesso! Agora você pode utilizá-lo em seus projetos.", 
+                customRequestSent: "✅ Solicitação enviada com sucesso! Nossa equipe de engenharia analisará seu pedido e retornará em até 48 horas com uma proposta personalizada.", 
+                recentActivity: "Atividade Recente", 
+                myTokens: "Meus Tokens", 
+                usageHistory: "Histórico de Consumo", 
+                activeModels: "MODELOS ATIVOS", 
+                transactions: "TRANSAÇÕES", 
+                cancel: "Cancelar", 
+                confirm: "Confirmar", 
+                searchPlaceholder: "🔍 Busque por tarefa, nome ou categoria...", 
+                modelsFound: "modelos encontrados", 
+                page: "Pág", 
+                of: "de", 
+                previous: "Anterior", 
+                next: "Próximo", 
+                clawpackTitle: "CLAWPACK REWARDS", 
+                clawpackDesc: "Ganhe pontos a cada compra! Acumule e troque por tokens extras. Quanto mais você usa, mais ganha!", 
+                clawpackPoints: "Seus Pontos", 
+                clawpackRedeem: "Trocar Pontos (100 pts = 10k tokens)", 
+                essential: "ESSENTIAL", 
+                pro: "PRO", 
+                buy: "Comprar", 
+                clawpackSuccess: "✅ Pontos trocados com sucesso! +10,000 tokens adicionados à sua conta.", 
+                customConfirmTitle: "Confirmar Solicitação", 
+                customConfirmBody: "Você está prestes a solicitar um modelo personalizado. Nossa equipe analisará sua necessidade e desenvolverá uma solução sob medida. Custo: 2.500 tokens. Deseja continuar?", 
+                customProcessingTitle: "Processando Solicitação", 
+                customProcessingMsg: "Analisando sua solicitação e preparando proposta...", 
+                customConfirmBtn: "Sim, solicitar", 
+                customCancelBtn: "Cancelar",
+                aboutModelTitle: "Sobre este Modelo",
+                modelParameters: "Parâmetros",
+                modelTypeLabel: "Tipo",
+                modelCategory: "Categoria",
+                modelAccuracy: "Acurácia",
+                modelCostLabel: "Custo de Implantação",
+                // Form labels
+                taskLabel: "Qual tarefa seu modelo deve realizar?",
+                taskHint: "Descreva detalhadamente o que você precisa que o modelo faça",
+                taskExample: "Exemplo: classificar chamados de suporte por urgência (baixa, média, alta)",
+                formatLabel: "Como você quer receber o resultado?",
+                localLabel: "Onde esse modelo vai funcionar?",
+                notesLabel: "Notas adicionais",
+                notesHint: "Qualquer contexto extra, restrição ou preferência",
+                emailLabel: "Seu endereço de e-mail",
+                emailHint: "Usaremos apenas para enviar seu SLM personalizado",
+                howItWorksTitle: "🧩 Como Funciona",
+                step1: "Você descreve a tarefa em português",
+                step2: "Geramos dados sintéticos e testamos modelos base",
+                step3: "Ajustamos o SLM para seu caso específico",
+                step4: "Você recebe o modelo (API ou download)",
+                testimonial: "\"Pedimos um classificador de chamados em 5 minutos. Em 2 dias tinhamos a API rodando com 98% de acurácia.\"<br>— Rafael, Suporte Técnico",
+                playgroundTitle: "🎮 Playground",
+                playgroundDesc: "Teste modelos prontos antes de solicitar o seu.",
+                clawpackInstall: "📦 Instale o ClawPack",
+                clawpackInstallDesc: "Para open-source e fine-tuning local.",
+                noCommitment: "🔒 Sem compromisso. Você testa antes de contratar."
             },
-            1024: {
-                slidesPerView: 3,
-                spaceBetween: 25,
+            en: { 
+                loginSubtitle: "Small Language Models for Business", 
+                loginBtnText: "CREATE ACCOUNT • 100M FREE TOKENS", 
+                loginTokenText: "PLAN 0 • 100M FREE TOKENS", 
+                loginHint: "🔬 Any username/password creates account", 
+                bannerText: "INSTALL NEXUS AI • 128+ models", 
+                installBtnText: "INSTALL", 
+                menuBrowse: "Browse", 
+                menuCustom: "Custom SLM", 
+                menuDashboard: "Dashboard", 
+                menuDeployed: "Deployed", 
+                menuTokens: "Tokens", 
+                menuTheme: "Theme", 
+                menuLang: "Language: English", 
+                menuLogout: "Logout", 
+                statusText: "LIVE", 
+                tokenLabel: "tokens", 
+                heroTitle: "Small Language Models, Big Impact", 
+                heroDesc: "Discover SLMs (Small Language Models) optimized for specific business tasks. Models with up to 20B parameters that run locally with low latency and high performance.", 
+                slmExplanation: "🤖 What are SLMs? Compact language models (up to 20B parameters) that deliver superior performance for specific tasks, with lower cost and higher speed than traditional LLMs.",
+                freeBadge: "✨ Free to browse — Pay only for inference", 
+                browseTitle: "Browse Available Models", 
+                customTitle: "🧠 Build Your Custom SLM", 
+                customDesc: "Describe your needs in plain language. We'll generate synthetic data, evaluate base models, fine-tune, and deliver an optimized model for your task.",
+                customPlaceholder: "Ex: classify support tickets by urgency (low, medium, high)", 
+                customBtn: "Submit Request (2,500 tokens)", 
+                deployedTitle: "My Deployed Models", 
+                noModels: "No deployed models yet. Explore the marketplace and deploy your first SLM!", 
+                tokensAvailable: "tokens available", 
+                tokenWarning: "Plan 0 - 100M free tokens for testing", 
+                noUsage: "No usage recorded yet. Start by deploying a model!", 
+                noActivity: "No recent activity. Your actions will appear here.", 
+                deployedAt: "Deployed on", 
+                removeBtn: "Remove", 
+                deployBtn: "Deploy", 
+                modalDeploy: "Deploy Model", 
+                modalConfirmTitle: "Confirm Deployment", 
+                modalConfirmDesc: "Are you sure you want to deploy this model? The cost will be deducted from your tokens and the model will be available in your 'Deployed' area.", 
+                modalSuccessTitle: "Success!", 
+                modalErrorTitle: "Error", 
+                insufficientTokens: "❌ Insufficient tokens! Purchase a plan to continue.", 
+                deployedAlert: "✅ Model successfully deployed! You can now use it in your projects.", 
+                customRequestSent: "✅ Request sent successfully! Our engineering team will analyze your request and get back to you within 48 hours with a custom proposal.", 
+                recentActivity: "Recent Activity", 
+                myTokens: "My Tokens", 
+                usageHistory: "Usage History", 
+                activeModels: "ACTIVE MODELS", 
+                transactions: "TRANSACTIONS", 
+                cancel: "Cancel", 
+                confirm: "Confirm", 
+                searchPlaceholder: "🔍 Search by task, name or category...", 
+                modelsFound: "models found", 
+                page: "Page", 
+                of: "of", 
+                previous: "Prev", 
+                next: "Next", 
+                clawpackTitle: "CLAWPACK REWARDS", 
+                clawpackDesc: "Earn points with every purchase! Accumulate and exchange for extra tokens. The more you use, the more you earn!", 
+                clawpackPoints: "Your Points", 
+                clawpackRedeem: "Redeem Points (100 pts = 10k tokens)", 
+                essential: "ESSENTIAL", 
+                pro: "PRO", 
+                buy: "Buy", 
+                clawpackSuccess: "✅ Points redeemed successfully! +10,000 tokens added to your account.", 
+                customConfirmTitle: "Confirm Request", 
+                customConfirmBody: "You are about to request a custom model. Our team will analyze your needs and develop a tailored solution. Cost: 2,500 tokens. Continue?", 
+                customProcessingTitle: "Processing Request", 
+                customProcessingMsg: "Analyzing your request and preparing proposal...", 
+                customConfirmBtn: "Yes, request", 
+                customCancelBtn: "Cancel",
+                aboutModelTitle: "About this Model",
+                modelParameters: "Parameters",
+                modelTypeLabel: "Type",
+                modelCategory: "Category",
+                modelAccuracy: "Accuracy",
+                modelCostLabel: "Deployment Cost",
+                taskLabel: "What task should your model perform?",
+                taskHint: "Describe in detail what you need the model to do",
+                taskExample: "Example: classify support tickets by urgency (low, medium, high)",
+                formatLabel: "How do you want to receive the result?",
+                localLabel: "Where will this model run?",
+                notesLabel: "Additional notes",
+                notesHint: "Any extra context, constraints or preferences",
+                emailLabel: "Your email address",
+                emailHint: "We'll only use this to send your custom SLM",
+                howItWorksTitle: "🧩 How It Works",
+                step1: "You describe the task in plain language",
+                step2: "We generate synthetic data and test base models",
+                step3: "We fine-tune the SLM for your specific case",
+                step4: "You receive the model (API or download)",
+                testimonial: "\"We requested a ticket classifier in 5 minutes. Within 2 days we had the API running with 98% accuracy.\"<br>— Rafael, Support Team",
+                playgroundTitle: "🎮 Playground",
+                playgroundDesc: "Test ready-made models before requesting yours.",
+                clawpackInstall: "📦 Install ClawPack",
+                clawpackInstallDesc: "For open-source and local fine-tuning.",
+                noCommitment: "🔒 No commitment. You test before purchasing."
+            },
+            es: { 
+                loginSubtitle: "Small Language Models for Business", 
+                loginBtnText: "CREAR CUENTA • 100M TOKENS", 
+                loginTokenText: "PLAN 0 • 100M TOKENS", 
+                loginHint: "🔬 Cualquier usuario/contraseña crea cuenta", 
+                bannerText: "INSTALA NEXUS AI • 128+ modelos", 
+                installBtnText: "INSTALAR", 
+                menuBrowse: "Explorar", 
+                menuCustom: "SLM Personalizado", 
+                menuDashboard: "Panel", 
+                menuDeployed: "Desplegados", 
+                menuTokens: "Tokens", 
+                menuTheme: "Tema", 
+                menuLang: "Idioma: Español", 
+                menuLogout: "Salir", 
+                statusText: "LIVE", 
+                tokenLabel: "tokens", 
+                heroTitle: "Modelos Pequeños, Gran Impacto", 
+                heroDesc: "Descubre SLMs (Small Language Models) optimizados para tareas empresariales específicas. Modelos con hasta 20B parámetros que funcionan localmente con baja latencia.", 
+                slmExplanation: "🤖 ¿Qué son los SLMs? Modelos de lenguaje compactos (hasta 20B parámetros) que ofrecen rendimiento superior para tareas específicas, con menor costo y mayor velocidad.",
+                freeBadge: "✨ Gratis para explorar — Paga solo por inferencia", 
+                browseTitle: "Explorar Modelos", 
+                customTitle: "🧠 Construye tu SLM Personalizado", 
+                customDesc: "Describe tu necesidad en lenguaje simple. Generaremos datos sintéticos, evaluaremos modelos base, ajustaremos y entregaremos un modelo optimizado para tu tarea.",
+                customPlaceholder: "Ej: clasificar tickets de soporte por urgencia (baja, media, alta)", 
+                customBtn: "Enviar Solicitud (2.500 tokens)", 
+                deployedTitle: "Mis Modelos", 
+                noModels: "Aún no hay modelos. ¡Explora el marketplace!", 
+                tokensAvailable: "tokens disponibles", 
+                tokenWarning: "Plan 0 - 100M tokens gratis", 
+                noUsage: "Sin consumo registrado", 
+                noActivity: "Sin actividad reciente", 
+                deployedAt: "Desplegado el", 
+                removeBtn: "Eliminar", 
+                deployBtn: "Desplegar", 
+                modalDeploy: "Desplegar", 
+                modalConfirmTitle: "Confirmar", 
+                modalConfirmDesc: "¿Desplegar este modelo?", 
+                modalSuccessTitle: "¡Éxito!", 
+                modalErrorTitle: "Error", 
+                insufficientTokens: "❌ ¡Tokens insuficientes!", 
+                deployedAlert: "✅ ¡Modelo desplegado!", 
+                customRequestSent: "✅ ¡Solicitud enviada! Nuestro equipo te contactará.", 
+                recentActivity: "Actividad Reciente", 
+                myTokens: "Mis Tokens", 
+                usageHistory: "Historial", 
+                activeModels: "MODELOS ACTIVOS", 
+                transactions: "TRANSACCIONES", 
+                cancel: "Cancelar", 
+                confirm: "Confirmar", 
+                searchPlaceholder: "🔍 Buscar...", 
+                modelsFound: "modelos", 
+                page: "Pág", 
+                of: "de", 
+                previous: "Anterior", 
+                next: "Siguiente", 
+                clawpackTitle: "CLAWPACK", 
+                clawpackDesc: "¡Gana puntos con cada compra!", 
+                clawpackPoints: "Puntos", 
+                clawpackRedeem: "Canjear (100 pts = 10k tokens)", 
+                essential: "ESSENTIAL", 
+                pro: "PRO", 
+                buy: "Comprar", 
+                clawpackSuccess: "✅ ¡Puntos canjeados!", 
+                customConfirmTitle: "Confirmar", 
+                customConfirmBody: "Solicitar modelo personalizado por 2.500 tokens. ¿Continuar?", 
+                customProcessingTitle: "Procesando", 
+                customProcessingMsg: "Analizando...", 
+                customConfirmBtn: "Sí", 
+                customCancelBtn: "Cancelar",
+                aboutModelTitle: "Sobre el Modelo",
+                modelParameters: "Parámetros",
+                modelTypeLabel: "Tipo",
+                modelCategory: "Categoría",
+                modelAccuracy: "Precisión",
+                modelCostLabel: "Costo",
+                taskLabel: "¿Qué tarea debe realizar tu modelo?",
+                taskHint: "Describe detalladamente lo que necesitas",
+                taskExample: "Ejemplo: clasificar tickets por urgencia",
+                formatLabel: "¿Cómo quieres recibir el resultado?",
+                localLabel: "¿Dónde funcionará este modelo?",
+                notesLabel: "Notas adicionales",
+                notesHint: "Contexto extra, restricciones o preferencias",
+                emailLabel: "Tu correo electrónico",
+                emailHint: "Solo lo usaremos para enviar tu SLM",
+                howItWorksTitle: "🧩 Cómo Funciona",
+                step1: "Describes la tarea",
+                step2: "Generamos datos sintéticos",
+                step3: "Ajustamos el SLM",
+                step4: "Recibes el modelo",
+                testimonial: "\"Solicitamos un clasificador de tickets. En 2 días teníamos la API con 98% de precisión.\"",
+                playgroundTitle: "🎮 Playground",
+                playgroundDesc: "Prueba modelos listos antes de solicitar.",
+                clawpackInstall: "📦 Instalar ClawPack",
+                clawpackInstallDesc: "Para open-source y fine-tuning local.",
+                noCommitment: "🔒 Sin compromiso. Prueba antes de comprar."
             }
-        }
-    });
-
-    const featuresSwiper = new Swiper('.featuresSwiper', {
-        slidesPerView: 1,
-        spaceBetween: 20,
-        pagination: {
-            el: '.features-pagination',
-            clickable: true,
-        },
-        breakpoints: {
-            480: {
-                slidesPerView: 1.2,
-                spaceBetween: 20,
-            }
-        }
-    });
-
-    // ------ BILÍNGUE (PT/EN) + Mobile Hamburguer + Simulação de Compra ------
-    const translations = {
-        pt: {
-            nav_features: "Recursos",
-            nav_pricing: "Preço",
-            nav_support: "Suporte",
-            btn_download: "BAIXAR AGORA",
-            btn_download_mobile: "BAIXAR AGORA →",
-            btn_main_cta: "DOMINE SEUS DADOS POR R$ 47",
-            final_cta: "QUERO O NEXUS AGORA",
-            hero_tagline: "// SISTEMA TÁCTICO DE DADOS",
-            hero_title: "Cansado de Planilhas <span class='gradient-text'>Burras?</span>",
-            hero_desc: "Nexus é o Command Center financeiro definitivo. Visualize seu fluxo de caixa, investimentos e ROI com uma interface FUI digna de elite.",
-            features_title: "Por que você <span class='neon-text'>&lt;precisa&gt;</span> disso",
-            feat1_title: "Lógica Full-Stack",
-            feat1_desc: "Nexus processa dados complexos e gera gráficos de ROI precisos automaticamente. Lógica de dev, visual de designer.",
-            feat2_title: "Interface Táctica FUI",
-            feat2_desc: "Cansado do visual corporativo branco? Domine suas finanças com design Dark Mode, fontes mono e animações suaves.",
-            feat3_title: "Controle de Freela/VFX",
-            feat3_desc: "Módulos específicos para calcular custo de hora, ROI de softwares (como render farms) e impostos de importação.",
-            pricing_title: "Acesso Vitalício",
-            price_badge: "OFERTA LIMITADA",
-            price_feat1: "Código-fonte Completo (React/HTML/CSS)",
-            price_feat2: "Template Notion 'Nexus Pro' Incluído",
-            price_feat3: "Guia de Instalação Rápida (SOP)",
-            price_feat4: "Atualizações Gratuitas para Sempre",
-            alert_msg: "Redirecionando para o Checkout Seguro (Simulação). Você receberá o acesso ao código e ao template no seu e-mail."
-        },
-        en: {
-            nav_features: "Features",
-            nav_pricing: "Pricing",
-            nav_support: "Support",
-            btn_download: "DOWNLOAD NOW",
-            btn_download_mobile: "DOWNLOAD NOW →",
-            btn_main_cta: "MASTER YOUR DATA FOR $9 USD",
-            final_cta: "GET NEXUS NOW",
-            hero_tagline: "// TACTICAL DATA SYSTEM",
-            hero_title: "Tired of <span class='gradient-text'>Stupid</span> Spreadsheets?",
-            hero_desc: "Nexus is the ultimate Finance Command Center. Visualize cash flow, investments, and ROI with an elite FUI interface.",
-            features_title: "Why you <span class='neon-text'>&lt;need&gt;</span> this",
-            feat1_title: "Full-Stack Logic",
-            feat1_desc: "Not just aesthetics. Nexus processes complex data and generates precise ROI charts automatically. Dev logic, designer visuals.",
-            feat2_title: "Tactical FUI",
-            feat2_desc: "Tired of white corporate dashboards? Master your finances with Dark Mode, mono fonts, and smooth animations.",
-            feat3_title: "Freelance/VFX Control",
-            feat3_desc: "Specific modules to calculate hourly costs, software ROI (render farms) and service import taxes.",
-            pricing_title: "Lifetime Access",
-            price_badge: "LIMITED OFFER",
-            price_feat1: "Full Source Code (React/HTML/CSS)",
-            price_feat2: "Notion 'Nexus Pro' Template Included",
-            price_feat3: "Quick Installation Guide (SOP)",
-            price_feat4: "Free Updates Forever",
-            alert_msg: "Redirecting to Secure Checkout (Simulation). You will receive access to the code and template via email."
-        }
-    };
-
-    let currentLang = 'pt';
-
-    function updateLanguage(lang) {
-        const t = translations[lang];
-        if (!t) return;
-        
-        document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            if (t[key]) {
-                if (el.tagName === 'BUTTON' || el.tagName === 'A') {
-                    el.innerHTML = t[key];
-                } else {
-                    el.innerText = t[key];
-                }
-            }
-        });
-        
-        // IDs específicos
-        const elements = {
-            heroTagline: t.hero_tagline, heroTitle: t.hero_title, heroDesc: t.hero_desc,
-            featuresTitle: t.features_title, feat1_title: t.feat1_title, feat1_desc: t.feat1_desc,
-            feat2_title: t.feat2_title, feat2_desc: t.feat2_desc, feat3_title: t.feat3_title,
-            feat3_desc: t.feat3_desc, pricingTitle: t.pricing_title, priceBadge: t.price_badge,
-            price_feat1: t.price_feat1, price_feat2: t.price_feat2, price_feat3: t.price_feat3,
-            price_feat4: t.price_feat4,
-            feat1_title_mob: t.feat1_title, feat1_desc_mob: t.feat1_desc,
-            feat2_title_mob: t.feat2_title, feat2_desc_mob: t.feat2_desc,
-            feat3_title_mob: t.feat3_title, feat3_desc_mob: t.feat3_desc
         };
         
-        for (const [id, value] of Object.entries(elements)) {
-            const el = document.getElementById(id);
-            if (el) {
-                if (id === 'heroTitle') el.innerHTML = value;
-                else if (id === 'featuresTitle') el.innerHTML = value;
-                else el.innerText = value;
-            }
+        function t(key) { return texts[currentLang][key] || key; }
+        function formatNumber(n) { return n.toLocaleString(currentLang === 'pt' ? 'pt-BR' : 'en-US'); }
+        
+        function getFilteredModels() {
+            let filtered = modelCatalog;
+            if (currentCategory !== 'all') filtered = filtered.filter(m => m.category === currentCategory);
+            if (currentSearch) { const sl = currentSearch.toLowerCase(); filtered = filtered.filter(m => m.name.toLowerCase().includes(sl) || m.desc.toLowerCase().includes(sl)); }
+            return filtered;
         }
         
-        const mainBtn = document.getElementById('mainCtaBtn');
-        if (mainBtn) mainBtn.innerText = t.btn_main_cta;
-        const finalBtn = document.getElementById('finalCtaBtn');
-        if (finalBtn) finalBtn.innerText = t.final_cta;
-        const desktopCta = document.getElementById('desktopCta');
-        if (desktopCta) desktopCta.innerText = t.btn_download;
-        const mobileCta = document.getElementById('mobileCtaBtn');
-        if (mobileCta) mobileCta.innerText = t.btn_download_mobile;
-    }
-
-    // Alternar idioma
-    document.getElementById('langToggleBtn')?.addEventListener('click', () => {
-        currentLang = currentLang === 'pt' ? 'en' : 'pt';
-        updateLanguage(currentLang);
-        const toggle = document.getElementById('langToggleBtn');
-        if (toggle) toggle.innerHTML = currentLang === 'pt' ? '<i class="fas fa-globe"></i> PT/EN' : '<i class="fas fa-globe"></i> EN/PT';
-    });
-
-    // Mobile Hamburguer
-    const hamburger = document.getElementById('hamburgerBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
-    if (hamburger && mobileMenu) {
-        hamburger.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            const spans = hamburger.querySelectorAll('span');
-            if (mobileMenu.classList.contains('active')) {
-                spans[0].style.transform = 'rotate(45deg) translate(5px, 6px)';
-                spans[1].style.opacity = '0';
-                spans[2].style.transform = 'rotate(-45deg) translate(5px, -6px)';
-            } else {
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
-            }
-        });
-        const mobileLinks = mobileMenu.querySelectorAll('a');
-        mobileLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.remove('active');
-                const spans = hamburger.querySelectorAll('span');
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
-            });
-        });
-    }
-
-    window.addEventListener('resize', () => {
-        if (window.innerWidth >= 768 && mobileMenu?.classList.contains('active')) {
-            mobileMenu.classList.remove('active');
-            if (hamburger) {
-                const spans = hamburger.querySelectorAll('span');
-                spans[0].style.transform = 'none';
-                spans[1].style.opacity = '1';
-                spans[2].style.transform = 'none';
-            }
+        function getPaginatedModels() {
+            const filtered = getFilteredModels();
+            const start = (currentPage - 1) * itemsPerPage;
+            return { models: filtered.slice(start, start + itemsPerPage), total: filtered.length, totalPages: Math.ceil(filtered.length / itemsPerPage) };
         }
-    });
-
-    function handlePurchase() {
-        const msg = translations[currentLang].alert_msg;
-        alert(msg);
-        window.open("https://gumroad.com", "_blank");
-    }
-
-    const ctaButtons = ['mainCtaBtn', 'finalCtaBtn', 'desktopCta', 'mobileCtaBtn'];
-    ctaButtons.forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) btn.addEventListener('click', handlePurchase);
-    });
-
-    document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            const hash = this.getAttribute('href');
-            if (hash && hash.startsWith('#')) {
-                e.preventDefault();
-                const targetId = hash.substring(1);
-                const targetEl = document.getElementById(targetId);
-                if (targetEl) {
-                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        async function updateTokenDisplay() { const span = document.getElementById("tokenAmount"); if (span) span.innerText = formatNumber(userTokens); await db.setItem(`tokens_${currentUser}`, userTokens); }
+        async function spendTokens(amount, description) { if (userTokens >= amount) { userTokens -= amount; await updateTokenDisplay(); modelUsageHistory.unshift({ date: new Date().toISOString(), amount, description, balance: userTokens }); await db.setItem(`history_${currentUser}`, modelUsageHistory.slice(0, 50)); return true; } showErrorModal(t("insufficientTokens")); return false; }
+        async function addClawpackPoints(amount, reason) { clawpackPoints += amount; clawpackHistory.unshift({ date: new Date().toISOString(), amount, reason, balance: clawpackPoints }); await db.setItem(`clawpack_${currentUser}`, clawpackPoints); await db.setItem(`clawpack_history_${currentUser}`, clawpackHistory.slice(0, 50)); renderFullUI(); }
+        async function redeemClawpackPoints() { if (clawpackPoints >= 100) { clawpackPoints -= 100; userTokens += 10000; await updateTokenDisplay(); clawpackHistory.unshift({ date: new Date().toISOString(), amount: -100, reason: "Resgate: 100 pts → 10k tokens", balance: clawpackPoints }); await db.setItem(`clawpack_${currentUser}`, clawpackPoints); await db.setItem(`clawpack_history_${currentUser}`, clawpackHistory); await db.setItem(`tokens_${currentUser}`, userTokens); showSuccessModal(t("clawpackSuccess")); renderFullUI(); showView('tokens'); } else { showErrorModal("❌ Você precisa de pelo menos 100 pontos!"); } }
+        async function purchasePlan(planKey) { const plan = plans[planKey]; userTokens += plan.tokens + (plan.bonus || 0); clawpackPoints += plan.points; await updateTokenDisplay(); clawpackHistory.unshift({ date: new Date().toISOString(), amount: plan.points, reason: `Compra: ${plan.name}`, balance: clawpackPoints }); modelUsageHistory.unshift({ date: new Date().toISOString(), amount: plan.tokens + (plan.bonus || 0), description: `Compra: ${plan.name}`, balance: userTokens }); await db.setItem(`clawpack_${currentUser}`, clawpackPoints); await db.setItem(`clawpack_history_${currentUser}`, clawpackHistory); await db.setItem(`history_${currentUser}`, modelUsageHistory); showSuccessModal(`✅ ${plan.name} adquirido! +${formatNumber(plan.tokens + (plan.bonus || 0))} tokens e +${plan.points} pontos!`); renderFullUI(); showView('tokens'); }
+        async function deployModel(model) { if (await spendTokens(model.cost, `Deploy: ${model.name}`)) { deployedModels.push({ ...model, deployedAt: new Date().toISOString() }); await db.setItem(`deployed_${currentUser}`, deployedModels); showSuccessModal(`${t("deployedAlert")} ${model.name}`); renderFullUI(); showView('deployed'); } }
+        async function removeModel(modelId) { deployedModels = deployedModels.filter(m => m.id !== modelId); await db.setItem(`deployed_${currentUser}`, deployedModels); renderFullUI(); showView('deployed'); }
+        
+        function showModal(title, body, onConfirm = null, showCancel = false, confirmText = null, cancelText = null) {
+            const modal = document.getElementById("actionModal"); if (!modal) return;
+            document.getElementById("modalTitle").innerHTML = title; document.getElementById("modalBody").innerHTML = body;
+            document.getElementById("modalConfirmBtn").innerHTML = confirmText || t("confirm");
+            document.getElementById("modalCancelBtn").style.display = showCancel ? "block" : "none";
+            document.getElementById("modalCancelBtn").innerHTML = cancelText || t("cancel");
+            const confirmBtn = document.getElementById("modalConfirmBtn"), cancelBtn = document.getElementById("modalCancelBtn");
+            const newConfirm = confirmBtn.cloneNode(true), newCancel = cancelBtn.cloneNode(true);
+            confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn); cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
+            newConfirm.onclick = () => { closeModal("actionModal"); if (onConfirm) onConfirm(); };
+            newCancel.onclick = () => closeModal("actionModal");
+            modal.style.display = "flex";
+        }
+        
+        function showProcessingModal(title, message) {
+            const existing = document.getElementById("processingModal"); if (existing) existing.remove();
+            const modal = document.createElement("div"); modal.id = "processingModal"; modal.className = "modal"; modal.style.display = "flex";
+            modal.innerHTML = `<div class="modal-content" style="text-align: center; max-width: 400px;"><div class="loading-spinner" style="margin: 1rem auto;"></div><div class="modal-title" style="color: var(--primary);">${title}</div><div class="modal-body" style="margin: 1rem 0;">${message}</div><div class="loading-progress" style="width: 100%;"><div class="loading-progress-bar" id="processingProgress" style="width: 0%;"></div></div></div>`;
+            document.body.appendChild(modal);
+            let progress = 0; const interval = setInterval(() => { progress += Math.random() * 15; if (progress >= 100) progress = 100; const pb = document.getElementById("processingProgress"); if (pb) pb.style.width = progress + "%"; if (progress >= 100) clearInterval(interval); }, 200);
+            modal._progressInterval = interval; return modal;
+        }
+        
+        function closeProcessingModal(modal) { if (modal && modal._progressInterval) clearInterval(modal._progressInterval); if (modal) modal.remove(); }
+        function showSuccessModal(message) { const modal = document.getElementById("successModal"); if (!modal) return; document.getElementById("successModalTitle").innerHTML = `<i class="fas fa-check-circle" style="color:var(--success)"></i> ${t("modalSuccessTitle")}`; document.getElementById("successModalBody").innerHTML = message; const closeBtn = document.getElementById("successModalClose"); const newClose = closeBtn.cloneNode(true); closeBtn.parentNode.replaceChild(newClose, closeBtn); newClose.onclick = () => closeModal("successModal"); modal.style.display = "flex"; setTimeout(() => closeModal("successModal"), 4000); }
+        function showErrorModal(message) { const modal = document.getElementById("errorModal"); if (!modal) return; document.getElementById("errorModalTitle").innerHTML = `<i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i> ${t("modalErrorTitle")}`; document.getElementById("errorModalBody").innerHTML = message; const closeBtn = document.getElementById("errorModalClose"); const newClose = closeBtn.cloneNode(true); closeBtn.parentNode.replaceChild(newClose, closeBtn); newClose.onclick = () => closeModal("errorModal"); modal.style.display = "flex"; setTimeout(() => closeModal("errorModal"), 3000); }
+        function closeModal(modalId) { const modal = document.getElementById(modalId); if (modal) modal.style.display = "none"; }
+        
+        function showModelDetailModal(model) {
+            const modal = document.getElementById("modelDetailModal"); if (!modal) return;
+            document.getElementById("modelDetailTitle").innerHTML = `<i class="fas fa-microchip"></i> ${model.name}`;
+            document.getElementById("modelDetailDesc").innerHTML = model.longDesc || model.desc;
+            document.getElementById("modelDetailParams").innerHTML = model.params;
+            document.getElementById("modelDetailType").innerHTML = model.type;
+            document.getElementById("modelDetailCategory").innerHTML = categories.find(c => c.id === model.category)?.name || model.category;
+            document.getElementById("modelDetailAccuracy").innerHTML = model.accuracy || "N/A";
+            document.getElementById("modelDetailCost").innerHTML = `${formatNumber(model.cost)} tokens`;
+            const deployBtn = document.getElementById("modelDetailDeployBtn"); const newBtn = deployBtn.cloneNode(true);
+            deployBtn.parentNode.replaceChild(newBtn, deployBtn);
+            newBtn.onclick = () => { closeModal("modelDetailModal"); showModal(t("modalConfirmTitle"), `${t("modalConfirmDesc")}<br><br><strong>${model.name}</strong><br><br>📊 Parâmetros: ${model.params}<br>🎯 Acurácia: ${model.accuracy}<br>💰 Custo: ${formatNumber(model.cost)} tokens`, () => deployModel(model), true); };
+            newBtn.innerHTML = t("modalDeploy"); modal.style.display = "flex";
+        }
+        window.showModelDetail = (id) => showModelDetailModal(modelCatalog.find(m => m.id === id));
+        
+        // Função para enviar solicitação de SLM personalizado com formulário completo
+        async function submitCustomModel() {
+            const tarefa = document.getElementById("customTarefa")?.value.trim();
+            const formato = document.getElementById("customFormato")?.value;
+            const local = document.getElementById("customLocal")?.value;
+            const notas = document.getElementById("customNotas")?.value;
+            const email = document.getElementById("customEmail")?.value.trim();
+            
+            if (!tarefa) {
+                showErrorModal("❌ " + (currentLang === 'pt' ? "Descreva a tarefa do modelo primeiro!" : "Describe the model task first!"));
+                return;
+            }
+            if (!email || !email.includes('@')) {
+                showErrorModal("❌ " + (currentLang === 'pt' ? "Insira um e-mail válido!" : "Enter a valid email!"));
+                return;
+            }
+            
+            const descricaoCompleta = `Tarefa: ${tarefa} | Formato: ${formato} | Local: ${local} | Notas: ${notas} | Email: ${email}`;
+            
+            showModal(t("customConfirmTitle"), 
+                `${t("customConfirmBody")}<br><br>
+                📝 <strong>Tarefa:</strong> "${tarefa.substring(0, 150)}${tarefa.length > 150 ? '...' : ''}"<br>
+                🎯 <strong>Formato:</strong> ${formato === 'texto' ? 'Texto organizado' : (formato === 'json' ? 'Dados estruturados (JSON)' : 'Resposta curta')}<br>
+                ⚙️ <strong>Local:</strong> ${local === 'nuvem' ? 'Nuvem / API' : (local === 'edge' ? 'Dispositivo de Borda' : 'Ambos')}<br>
+                ✉️ <strong>Email:</strong> ${email}<br><br>
+                💰 <strong>Tokens atuais:</strong> ${formatNumber(userTokens)}<br>
+                🎯 <strong>Pontos Clawpack:</strong> ${clawpackPoints}`,
+                async () => {
+                    if (userTokens < 2500) {
+                        showErrorModal(t("insufficientTokens"));
+                        return;
+                    }
+                    const processingModal = showProcessingModal(t("customProcessingTitle"), t("customProcessingMsg"));
+                    await new Promise(resolve => setTimeout(resolve, 2500));
+                    closeProcessingModal(processingModal);
+                    
+                    if (await spendTokens(2500, `Custom SLM request: ${tarefa.substring(0, 50)}`)) {
+                        await addClawpackPoints(25, "Solicitação de modelo personalizado");
+                        showSuccessModal(`${t("customRequestSent")}<br><br>
+                            📝 "${tarefa.substring(0, 200)}${tarefa.length > 200 ? '...' : ''}"<br><br>
+                            🎯 Formato: ${formato === 'texto' ? 'Texto organizado' : (formato === 'json' ? 'JSON estruturado' : 'Resposta curta')}<br>
+                            ⚙️ Local: ${local === 'nuvem' ? 'Nuvem API' : (local === 'edge' ? 'Edge Device' : 'Ambos')}<br><br>
+                            💰 Tokens restantes: ${formatNumber(userTokens)}<br>
+                            🎯 Pontos Clawpack: +25 (total: ${clawpackPoints})`);
+                        
+                        // Limpar formulário
+                        document.getElementById("customTarefa").value = "";
+                        document.getElementById("customNotas").value = "";
+                        document.getElementById("customEmail").value = `${currentUser}@nexus.ai`;
+                        
+                        // Resetar seleção de cards
+                        document.querySelectorAll('#formatoOptionsCustom .option-card-custom').forEach(c => c.classList.remove('selected'));
+                        document.querySelector('#formatoOptionsCustom .option-card-custom[data-value="texto"]').classList.add('selected');
+                        document.getElementById("customFormato").value = "texto";
+                        
+                        document.querySelectorAll('#localOptionsCustom .option-card-custom').forEach(c => c.classList.remove('selected'));
+                        document.querySelector('#localOptionsCustom .option-card-custom[data-value="nuvem"]').classList.add('selected');
+                        document.getElementById("customLocal").value = "nuvem";
+                        
+                        renderFullUI();
+                    }
+                }, true, t("customConfirmBtn"), t("customCancelBtn"));
+        }
+        
+        async function loadFromDB() { userTokens = await db.getItem(`tokens_${currentUser}`) || 100000000; deployedModels = await db.getItem(`deployed_${currentUser}`) || []; modelUsageHistory = await db.getItem(`history_${currentUser}`) || []; clawpackPoints = await db.getItem(`clawpack_${currentUser}`) || 500; clawpackHistory = await db.getItem(`clawpack_history_${currentUser}`) || []; }
+        async function renderTokenHistory() { const container = document.getElementById("tokenHistoryList"); if (!container) return; if (modelUsageHistory.length === 0) { container.innerHTML = `<div style='padding:1rem;text-align:center'>${t("noUsage")}</div>`; return; } container.innerHTML = modelUsageHistory.map(h => `<div class="transaction-item"><span>${new Date(h.date).toLocaleString()}</span><span style="color:var(--warning)">- ${formatNumber(h.amount)} tokens</span><span>${h.description.substring(0, 40)}</span><span>${formatNumber(h.balance)}</span></div>`).join(""); }
+        
+        function showSecondLoading(callback) {
+            const secondLoading = document.getElementById("secondLoading"), progressBar = document.getElementById("loadingProgressBar2"), statusText = document.getElementById("loadingStatus2");
+            secondLoading.style.display = "flex"; secondLoading.classList.remove("hide");
+            let progress = 0; const interval = setInterval(() => { progress += 20; if (progressBar) progressBar.style.width = progress + "%"; if (statusText && progress <= 100) statusText.innerText = ["PREPARANDO...","CARREGANDO...","CONECTANDO...","PRONTO!"][Math.floor(progress/20)]; if (progress >= 100) { clearInterval(interval); setTimeout(() => { secondLoading.classList.add("hide"); setTimeout(() => { secondLoading.style.display = "none"; if (callback) callback(); }, 500); }, 200); } }, 400);
+        }
+        
+        function renderFiltersAndModels() {
+            const container = document.getElementById("filtersContainer"); if (!container) return;
+            const { models, total, totalPages } = getPaginatedModels();
+            container.innerHTML = `<div class="filters-section"><div class="search-bar"><input type="text" id="searchInput" class="search-input" placeholder="${t("searchPlaceholder")}" value="${currentSearch}"></div><div class="categories-grid" id="categoriesGrid"></div><div class="results-info"><span><i class="fas fa-microchip"></i> ${total} ${t("modelsFound")}</span><span><i class="fas fa-layer-group"></i> ${t("page")} ${currentPage} ${t("of")} ${totalPages || 1}</span></div></div><div class="models-grid" id="modelsGrid"></div><div class="pagination" id="paginationContainer"></div>`;
+            const catGrid = document.getElementById("categoriesGrid");
+            if (catGrid) { catGrid.innerHTML = categories.map(cat => `<button class="category-btn ${currentCategory === cat.id ? 'active' : ''}" data-category="${cat.id}">${cat.icon} ${cat.name}</button>`).join(""); document.querySelectorAll(".category-btn").forEach(btn => { btn.addEventListener("click", () => { currentCategory = btn.dataset.category; currentPage = 1; renderFiltersAndModels(); }); }); }
+            const searchInput = document.getElementById("searchInput"); if (searchInput) { searchInput.addEventListener("input", (e) => { currentSearch = e.target.value; currentPage = 1; renderFiltersAndModels(); }); }
+            const grid = document.getElementById("modelsGrid");
+            if (grid) { if (models.length === 0) { grid.innerHTML = `<div style='grid-column:1/-1;text-align:center;padding:2rem;'>Nenhum modelo encontrado.</div>`; } else { grid.innerHTML = models.map(m => `<div class="model-card" onclick="window.showModelDetail('${m.id}')"><div class="model-name">${m.name}</div><div class="model-type">${m.type} • ${formatNumber(m.params)}</div><div class="model-desc">${m.desc}</div><div class="model-meta"><span class="model-params"><i class="fas fa-microchip"></i> ${m.params}</span><span class="model-cost"><i class="fas fa-coins"></i> ${formatNumber(m.cost)} tokens</span><button class="deploy-btn" data-model-id="${m.id}">${t("deployBtn")}</button></div></div>`).join(""); document.querySelectorAll(".deploy-btn").forEach(btn => { btn.addEventListener("click", (e) => { e.stopPropagation(); const model = modelCatalog.find(m => m.id === btn.dataset.modelId); if (model) showModal(t("modalConfirmTitle"), `${t("modalConfirmDesc")}<br><br><strong>${model.name}</strong><br>📊 Parâmetros: ${model.params}<br>🎯 Acurácia: ${model.accuracy}<br>💰 Custo: ${formatNumber(model.cost)} tokens`, () => deployModel(model), true); }); }); } }
+            if (totalPages > 1) { const pagContainer = document.getElementById("paginationContainer"); let pages = []; if (totalPages <= 7) { for (let i = 1; i <= totalPages; i++) pages.push(i); } else if (currentPage <= 3) pages = [1,2,3,4,'...',totalPages]; else if (currentPage >= totalPages-2) pages = [1,'...',totalPages-3,totalPages-2,totalPages-1,totalPages]; else pages = [1,'...',currentPage-1,currentPage,currentPage+1,'...',totalPages]; pagContainer.innerHTML = `<button class="page-btn ${currentPage===1?'disabled':''}" data-page="prev">← ${t("previous")}</button>${pages.map(p => p==='...'?`<span class="page-btn disabled">...</span>`:`<button class="page-btn ${currentPage===p?'active':''}" data-page="${p}">${p}</button>`).join('')}<button class="page-btn ${currentPage===totalPages?'disabled':''}" data-page="next">${t("next")} →</button>`; document.querySelectorAll(".page-btn[data-page]").forEach(btn => { btn.addEventListener("click", () => { if(btn.classList.contains('disabled')) return; const page = btn.dataset.page; if(page==='prev') currentPage--; else if(page==='next') currentPage++; else currentPage = parseInt(page); renderFiltersAndModels(); }); }); }
+        }
+        
+        function renderFullUI() {
+            const taskSLMs = modelCatalog.filter(m => m.type === "Task SLM").length, generalModels = modelCatalog.filter(m => m.type === "General").length;
+            document.getElementById("appContainer").innerHTML = `
+                <div id="actionModal" class="modal" onclick="if(event.target===this) closeModal('actionModal')"><div class="modal-content"><button class="modal-close" onclick="closeModal('actionModal')">✕</button><div class="modal-title" id="modalTitle"></div><div class="modal-body" id="modalBody"></div><div class="modal-buttons"><button class="btn-secondary" id="modalCancelBtn" style="display:none"></button><button class="btn-primary" id="modalConfirmBtn"></button></div></div></div>
+                <div id="successModal" class="modal" onclick="if(event.target===this) closeModal('successModal')"><div class="modal-content"><button class="modal-close" onclick="closeModal('successModal')">✕</button><div class="modal-title" id="successModalTitle"></div><div class="modal-body" id="successModalBody"></div><button class="btn-primary" id="successModalClose">OK</button></div></div>
+                <div id="errorModal" class="modal" onclick="if(event.target===this) closeModal('errorModal')"><div class="modal-content"><button class="modal-close" onclick="closeModal('errorModal')">✕</button><div class="modal-title" id="errorModalTitle"></div><div class="modal-body" id="errorModalBody"></div><button class="btn-primary" id="errorModalClose">OK</button></div></div>
+                <div id="modelDetailModal" class="modal" onclick="if(event.target===this) closeModal('modelDetailModal')"><div class="modal-content"><button class="modal-close" onclick="closeModal('modelDetailModal')">✕</button><div class="modal-title" id="modelDetailTitle"></div><div class="modal-body" id="modelDetailDesc"></div><div class="modal-detail"><span>${t("modelParameters")}:</span><strong id="modelDetailParams"></strong></div><div class="modal-detail"><span>${t("modelTypeLabel")}:</span><strong id="modelDetailType"></strong></div><div class="modal-detail"><span>${t("modelCategory")}:</span><strong id="modelDetailCategory"></strong></div><div class="modal-detail"><span>${t("modelAccuracy")}:</span><strong id="modelDetailAccuracy"></strong></div><div class="modal-detail"><span>${t("modelCostLabel")}:</span><strong id="modelDetailCost"></strong></div><button class="btn-primary" style="margin-top:1rem" id="modelDetailDeployBtn">${t("modalDeploy")}</button></div></div>
+                <div id="browseView"><div class="hero"><h1>${t("heroTitle")}</h1><p>${t("heroDesc")}</p><div class="slm-explanation"><i class="fas fa-robot"></i> ${t("slmExplanation")}</div><div class="hero-stats"><div class="hero-stat"><div class="hero-stat-number">${modelCatalog.length}</div><div class="hero-stat-label">MODELS</div></div><div class="hero-stat"><div class="hero-stat-number">${taskSLMs}</div><div class="hero-stat-label">TASK SLMs</div></div><div class="hero-stat"><div class="hero-stat-number">${generalModels}</div><div class="hero-stat-label">GENERAL</div></div></div><div class="free-badge">${t("freeBadge")}</div></div><div class="section-title"><i class="fas fa-store"></i> ${t("browseTitle")}</div><div id="filtersContainer"></div></div>
+                <div id="customView" style="display:none;">
+                    <div class="hero" style="padding-bottom: 1rem;">
+                        <h1>${t("customTitle")}</h1>
+                        <p>${t("customDesc")}</p>
+                        <div class="free-badge" style="margin-top: 0.5rem;">⚡ Sem conhecimento em ML necessário</div>
+                    </div>
+                    <div class="custom-form-grid">
+                        <div class="custom-form-card">
+                            <form id="customSlmForm">
+                                <div class="form-group">
+                                    <label>📋 ${t("taskLabel")} <span class="required">*</span></label>
+                                    <textarea id="customTarefa" rows="3" class="custom-textarea" placeholder="${t("customPlaceholder")}"></textarea>
+                                    <div class="hint">${t("taskHint")}</div>
+                                    <div class="example">💡 ${t("taskExample")}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>🎯 ${t("formatLabel")} <span class="required">*</span></label>
+                                    <div class="options-grid-custom" id="formatoOptionsCustom">
+                                        <div class="option-card-custom" data-value="texto">
+                                            <span class="option-emoji">📄</span>
+                                            <div class="option-title">Texto organizado</div>
+                                            <div class="option-desc">E-mail, relatório, resumo</div>
+                                        </div>
+                                        <div class="option-card-custom" data-value="json">
+                                            <span class="option-emoji">🧩</span>
+                                            <div class="option-title">Dados estruturados</div>
+                                            <div class="option-desc">JSON, CSV, XML</div>
+                                        </div>
+                                        <div class="option-card-custom" data-value="curta">
+                                            <span class="option-emoji">💬</span>
+                                            <div class="option-title">Resposta curta</div>
+                                            <div class="option-desc">Classificação, sim/não</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="customFormato" value="texto">
+                                </div>
+                                <div class="form-group">
+                                    <label>⚙️ ${t("localLabel")} <span class="required">*</span></label>
+                                    <div class="options-grid-custom" id="localOptionsCustom">
+                                        <div class="option-card-custom" data-value="nuvem">
+                                            <span class="option-emoji">☁️</span>
+                                            <div class="option-title">Nuvem / API</div>
+                                            <div class="option-desc">Mais potente, fácil integração</div>
+                                        </div>
+                                        <div class="option-card-custom" data-value="edge">
+                                            <span class="option-emoji">📱</span>
+                                            <div class="option-title">Dispositivo de Borda</div>
+                                            <div class="option-desc">Offline, privacidade</div>
+                                        </div>
+                                        <div class="option-card-custom" data-value="ambos">
+                                            <span class="option-emoji">🔄</span>
+                                            <div class="option-title">Ambos</div>
+                                            <div class="option-desc">Flexibilidade total</div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="customLocal" value="nuvem">
+                                </div>
+                                <div class="form-group">
+                                    <label>📌 ${t("notesLabel")}</label>
+                                    <textarea id="customNotas" rows="2" class="custom-textarea" placeholder="Ex: evitar gírias, responder sempre em português formal, máximo de 50 tokens..."></textarea>
+                                    <div class="hint">${t("notesHint")}</div>
+                                </div>
+                                <div class="form-group">
+                                    <label>✉️ ${t("emailLabel")} <span class="required">*</span></label>
+                                    <input type="email" id="customEmail" class="search-input" style="width: 100%;" placeholder="voce@empresa.com" value="${currentUser}@nexus.ai">
+                                    <div class="hint">${t("emailHint")}</div>
+                                </div>
+                                <button type="button" id="submitCustomSlmBtn" class="btn-submit-custom">
+                                    🚀 ${t("customBtn")}
+                                </button>
+                                <div class="info-note">${t("noCommitment")}</div>
+                            </form>
+                        </div>
+                        <div>
+                            <div class="sidebar-box">
+                                <div class="panel-title">${t("howItWorksTitle")}</div>
+                                <ul class="steps-list">
+                                    <li><span class="step-number">1</span> ${t("step1")}</li>
+                                    <li><span class="step-number">2</span> ${t("step2")}</li>
+                                    <li><span class="step-number">3</span> ${t("step3")}</li>
+                                    <li><span class="step-number">4</span> ${t("step4")}</li>
+                                </ul>
+                                <div class="testimonial">${t("testimonial")}</div>
+                            </div>
+                            <div class="sidebar-box">
+                                <div class="panel-title">${t("playgroundTitle")}</div>
+                                <p style="font-size: 0.75rem; color: var(--text-muted);">${t("playgroundDesc")}</p>
+                                <div class="playground-tags">
+                                    <span class="playground-tag">🔍 Classificação</span>
+                                    <span class="playground-tag">✍️ Geração</span>
+                                    <span class="playground-tag">📊 Extração</span>
+                                </div>
+                            </div>
+                            <div class="sidebar-box">
+                                <div class="panel-title">${t("clawpackInstall")}</div>
+                                <p style="font-size: 0.7rem; color: var(--text-muted);">${t("clawpackInstallDesc")}</p>
+                                <code>pip install clawpack</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="deployedView" style="display:none;"><div class="section-title"><i class="fas fa-rocket"></i> ${t("deployedTitle")}</div><div id="deployedList" class="models-grid"></div></div>
+                <div id="dashboardView" style="display:none;"><div class="stats-row"><div class="stat-card"><div class="stat-number neon">${formatNumber(userTokens)}</div><div class="stat-label-sm">${t("tokensAvailable").toUpperCase()}</div></div><div class="stat-card"><div class="stat-number">${deployedModels.length}</div><div class="stat-label-sm">${t("activeModels")}</div></div><div class="stat-card"><div class="stat-number">${modelUsageHistory.length}</div><div class="stat-label-sm">${t("transactions")}</div></div></div><div class="panel"><div class="panel-title"><i class="fas fa-history"></i> ${t("recentActivity")}</div><div id="recentActivity" class="transactions-list"></div></div></div>
+                <div id="tokensView" style="display:none;"><div class="panel"><div class="panel-title"><i class="fas fa-coins"></i> ${t("myTokens")}</div><div style="text-align:center;padding:1rem;"><div style="font-size:2.5rem;font-family:monospace;color:var(--primary);">${formatNumber(userTokens)}</div><div>${t("tokensAvailable")}</div><div class="token-badge" style="display:inline-block;"><i class="fas fa-gift"></i> ${t("tokenWarning")}</div></div></div><div class="clawpack-section"><div class="clawpack-header"><i class="fas fa-paw" style="font-size:1.5rem;color:var(--clawpack);"></i><div><div class="clawpack-badge">🦞 ${t("clawpackTitle")}</div><div style="font-size:0.7rem;">${t("clawpackDesc")}</div></div></div><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;"><div><span style="font-size:0.65rem;">${t("clawpackPoints")}</span><div class="clawpack-points">${clawpackPoints} pts</div></div><button id="redeemClawpackBtn" class="clawpack-btn"><i class="fas fa-exchange-alt"></i> ${t("clawpackRedeem")}</button></div>${clawpackHistory.length>0?`<div style="margin-top:0.8rem;"><small><i class="fas fa-history"></i> Histórico:</small><div style="font-size:0.65rem;">${clawpackHistory.slice(0,3).map(h=>`<div>${new Date(h.date).toLocaleDateString()} - ${h.reason} (${h.amount>0?'+':''}${h.amount} pts)</div>`).join('')}</div></div>`:''}</div><div class="panel"><div class="panel-title"><i class="fas fa-chart-line"></i> PLANOS</div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;"><div style="background:var(--bg-elevated);border-radius:16px;padding:1rem;text-align:center;"><div style="font-weight:bold;color:var(--primary);">${t("essential")}</div><div style="font-size:1.5rem;margin:0.5rem 0;">R$45</div><div>50M tokens</div><div>+450 pts</div><button class="btn-secondary" style="margin-top:0.8rem;width:100%;" onclick="purchasePlan('plan1')">${t("buy")}</button></div><div style="background:linear-gradient(135deg,#bc00ff10,#00f2ff10);border-radius:16px;padding:1rem;text-align:center;border:1px solid var(--secondary);"><div style="font-weight:bold;color:var(--secondary);">${t("pro")}</div><div style="font-size:1.5rem;margin:0.5rem 0;">R$150</div><div>175M tokens</div><div>+1,500 pts</div><button class="btn-primary" style="margin-top:0.8rem;width:100%;" onclick="purchasePlan('plan2')">${t("buy")}</button></div></div></div><div class="panel"><div class="panel-title"><i class="fas fa-history"></i> ${t("usageHistory")}</div><div id="tokenHistoryList" class="transactions-list"></div></div></div>
+            `;
+            renderFiltersAndModels();
+            
+            // Setup dos cards de seleção no formulário customizado
+            function setupCustomCardSelection() {
+                const formatoContainer = document.getElementById("formatoOptionsCustom");
+                const localContainer = document.getElementById("localOptionsCustom");
+                
+                if (formatoContainer) {
+                    document.querySelectorAll('#formatoOptionsCustom .option-card-custom').forEach(card => {
+                        card.addEventListener('click', () => {
+                            document.querySelectorAll('#formatoOptionsCustom .option-card-custom').forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                            document.getElementById("customFormato").value = card.dataset.value;
+                        });
+                    });
+                }
+                
+                if (localContainer) {
+                    document.querySelectorAll('#localOptionsCustom .option-card-custom').forEach(card => {
+                        card.addEventListener('click', () => {
+                            document.querySelectorAll('#localOptionsCustom .option-card-custom').forEach(c => c.classList.remove('selected'));
+                            card.classList.add('selected');
+                            document.getElementById("customLocal").value = card.dataset.value;
+                        });
+                    });
                 }
             }
-        });
-    });
-
-    updateLanguage('pt');
+            
+            setupCustomCardSelection();
+            
+            // Marcar primeiro como selecionado
+            const firstFormato = document.querySelector('#formatoOptionsCustom .option-card-custom');
+            if (firstFormato) firstFormato.classList.add('selected');
+            const firstLocal = document.querySelector('#localOptionsCustom .option-card-custom');
+            if (firstLocal) firstLocal.classList.add('selected');
+            
+            document.getElementById("submitCustomSlmBtn")?.addEventListener("click", (e) => {
+                e.preventDefault();
+                submitCustomModel();
+            });
+            
+            const deployedList = document.getElementById("deployedList");
+            if (deployedList) { if (deployedModels.length === 0) { deployedList.innerHTML = `<div style='grid-column:1/-1;text-align:center;padding:2rem;'>${t("noModels")}</div>`; } else { deployedList.innerHTML = deployedModels.map(m => `<div class="model-card"><div class="model-name">${m.name}</div><div class="model-type">${m.type}</div><div class="model-desc">${m.desc}</div><div class="model-meta"><span class="model-params"><i class="fas fa-microchip"></i> ${m.params}</span><button class="deploy-btn btn-danger" data-remove-id="${m.id}">${t("removeBtn")}</button></div></div>`).join(""); document.querySelectorAll("[data-remove-id]").forEach(btn => { btn.addEventListener("click", () => removeModel(btn.dataset.removeId)); }); } }
+            const recent = document.getElementById("recentActivity"); if (recent) { if (modelUsageHistory.length === 0) { recent.innerHTML = `<div style='padding:1rem;text-align:center'>${t("noActivity")}</div>`; } else { recent.innerHTML = modelUsageHistory.slice(0,10).map(h => `<div class="transaction-item"><span>${new Date(h.date).toLocaleString()}</span><span style="color:var(--warning)">- ${formatNumber(h.amount)} tokens</span><span>${h.description}</span></div>`).join(""); } }
+            document.getElementById("redeemClawpackBtn")?.addEventListener("click", redeemClawpackPoints);
+            renderTokenHistory();
+        }
+        
+        function showView(view) { const views = ["browseView","customView","deployedView","dashboardView","tokensView"]; views.forEach(v => { const el = document.getElementById(v); if(el) el.style.display = v === `${view}View` ? "block" : "none"; }); }
+        function closeMenu() { document.getElementById("sideMenu")?.classList.remove("open"); document.getElementById("menuOverlay")?.classList.remove("open"); }
+        
+        function updateLanguage() {
+            document.getElementById("loginSubtitle").innerText = t("loginSubtitle"); document.getElementById("loginBtnText").innerText = t("loginBtnText"); document.getElementById("loginTokenText").innerText = t("loginTokenText"); document.getElementById("loginHint").innerText = t("loginHint"); document.getElementById("bannerText").innerText = t("bannerText"); document.getElementById("installBtnText").innerText = t("installBtnText"); document.getElementById("menuBrowseText").innerText = t("menuBrowse"); document.getElementById("menuCustomText").innerText = t("menuCustom"); document.getElementById("menuDashboardText").innerText = t("menuDashboard"); document.getElementById("menuDeployedText").innerText = t("menuDeployed"); document.getElementById("menuTokensText").innerText = t("menuTokens"); document.getElementById("menuThemeText").innerText = t("menuTheme"); document.getElementById("menuLangText").innerHTML = currentLang === "pt" ? "Idioma: Português" : (currentLang === "en" ? "Language: English" : "Idioma: Español"); document.getElementById("menuLogoutText").innerText = t("menuLogout"); document.getElementById("statusText").innerText = t("statusText"); document.getElementById("tokenLabel").innerText = t("tokenLabel");
+            const desktopItems = document.querySelectorAll(".desktop-nav-item");
+            if(desktopItems.length) { desktopItems[0].innerHTML = `<i class="fas fa-store"></i> ${currentLang === 'pt' ? 'Models' : (currentLang === 'en' ? 'Models' : 'Modelos')}`; desktopItems[1].innerHTML = `<i class="fas fa-microchip"></i> ${currentLang === 'pt' ? 'Custom SLM' : (currentLang === 'en' ? 'Custom SLM' : 'SLM Personal')}`; desktopItems[2].innerHTML = `<i class="fas fa-chart-line"></i> ${currentLang === 'pt' ? 'Dash' : (currentLang === 'en' ? 'Dash' : 'Panel')}`; desktopItems[3].innerHTML = `<i class="fas fa-rocket"></i> ${currentLang === 'pt' ? 'Deployed' : (currentLang === 'en' ? 'Deployed' : 'Despl')}`; desktopItems[4].innerHTML = `<i class="fas fa-coins"></i> ${currentLang === 'pt' ? 'Tokens' : (currentLang === 'en' ? 'Tokens' : 'Tokens')}`; desktopItems[5].innerHTML = `<i class="fas fa-moon"></i> ${currentLang === 'pt' ? 'Theme' : (currentLang === 'en' ? 'Theme' : 'Tema')}`; desktopItems[6].innerHTML = `<i class="fas fa-language"></i> ${currentLang === 'pt' ? 'Idioma' : (currentLang === 'en' ? 'Lang' : 'Idioma')}`; desktopItems[7].innerHTML = `<i class="fas fa-sign-out-alt"></i> ${currentLang === 'pt' ? 'Sair' : (currentLang === 'en' ? 'Exit' : 'Salir')}`; }
+            renderFullUI();
+        }
+        
+        // EVENTOS
+        document.getElementById("closeBannerBtn")?.addEventListener("click", () => { document.getElementById("pwaBanner")?.classList.add("hide-banner"); localStorage.setItem("pwaBannerClosed","true"); });
+        document.getElementById("installAppBtn")?.addEventListener("click", async () => { if(deferredPrompt){deferredPrompt.prompt();deferredPrompt=null;}else{alert("📱 Instale pelo navegador: ⋮ → Instalar aplicativo");} });
+        if(localStorage.getItem("pwaBannerClosed")==="true") document.getElementById("pwaBanner")?.classList.add("hide-banner");
+        window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if(localStorage.getItem("pwaBannerClosed")!=="true") document.getElementById("pwaBanner")?.classList.remove("hide-banner"); });
+        
+        document.getElementById("loginBtn")?.addEventListener("click", async () => { const username = document.getElementById("loginUser").value.trim(); if(username){ currentUser = username; document.getElementById("loginContainer").classList.add("hide"); showSecondLoading(async () => { document.getElementById("mainApp").classList.add("visible"); document.getElementById("userNameDisplay").innerText = currentUser; await loadFromDB(); renderFullUI(); showView("browse"); }); } else { document.getElementById("loginError").innerText = "❌ Digite um nome de usuário"; } });
+        
+        document.getElementById("hamburgerBtn")?.addEventListener("click", () => { document.getElementById("sideMenu")?.classList.toggle("open"); document.getElementById("menuOverlay")?.classList.toggle("open"); });
+        document.getElementById("menuOverlay")?.addEventListener("click", closeMenu);
+        document.getElementById("menuBrowse")?.addEventListener("click", () => { showView("browse"); closeMenu(); });
+        document.getElementById("menuCustom")?.addEventListener("click", () => { showView("custom"); closeMenu(); });
+        document.getElementById("menuDashboard")?.addEventListener("click", () => { showView("dashboard"); closeMenu(); });
+        document.getElementById("menuDeployed")?.addEventListener("click", () => { showView("deployed"); closeMenu(); });
+        document.getElementById("menuTokens")?.addEventListener("click", () => { showView("tokens"); closeMenu(); renderTokenHistory(); });
+        document.getElementById("menuTheme")?.addEventListener("click", () => { document.body.classList.toggle("light-theme"); closeMenu(); });
+        document.getElementById("menuLang")?.addEventListener("click", () => { if(currentLang==='pt') currentLang='en'; else if(currentLang==='en') currentLang='es'; else currentLang='pt'; updateLanguage(); closeMenu(); });
+        document.getElementById("menuLogout")?.addEventListener("click", () => { document.getElementById("mainApp")?.classList.remove("visible"); document.getElementById("loginContainer")?.classList.remove("hide"); closeMenu(); });
+        
+        document.getElementById("desktopBrowse")?.addEventListener("click", () => showView("browse"));
+        document.getElementById("desktopCustom")?.addEventListener("click", () => showView("custom"));
+        document.getElementById("desktopDashboard")?.addEventListener("click", () => showView("dashboard"));
+        document.getElementById("desktopDeployed")?.addEventListener("click", () => showView("deployed"));
+        document.getElementById("desktopTokens")?.addEventListener("click", () => { showView("tokens"); renderTokenHistory(); });
+        document.getElementById("desktopTheme")?.addEventListener("click", () => document.body.classList.toggle("light-theme"));
+        document.getElementById("desktopLang")?.addEventListener("click", () => { if(currentLang==='pt') currentLang='en'; else if(currentLang==='en') currentLang='es'; else currentLang='pt'; updateLanguage(); });
+        document.getElementById("desktopLogout")?.addEventListener("click", () => { document.getElementById("mainApp")?.classList.remove("visible"); document.getElementById("loginContainer")?.classList.remove("hide"); });
+        
+        const showPrivacyModal = () => showModal("Privacidade", "Seus dados são protegidos. Tokens são apenas para demonstração.", null, false);
+        const showTermsModal = () => showModal("Termos", "Ambiente de demonstração. Tokens não possuem valor real.", null, false);
+        const showAboutModal = () => showModal("Sobre", "NEXUS AI é um marketplace de SLMs (Small Language Models) para tarefas empresariais. Nossa plataforma conecta empresas a modelos otimizados de IA.", null, false);
+        const showSLMInfoModal = () => showModal("O que são SLMs?", "SLMs (Small Language Models) são modelos de linguagem compactos com até 20 bilhões de parâmetros. Eles oferecem:<br><br>✅ Maior velocidade de inferência<br>✅ Menor custo operacional<br>✅ Capacidade de rodar localmente<br>✅ Otimização para tarefas específicas<br>✅ Menor consumo de energia<br><br>Ideal para empresas que precisam de IA eficiente e especializada!", null, false);
+        
+        document.getElementById("privacyLinkDesktop")?.addEventListener("click", (e) => { e.preventDefault(); showPrivacyModal(); });
+        document.getElementById("termsLinkDesktop")?.addEventListener("click", (e) => { e.preventDefault(); showTermsModal(); });
+        document.getElementById("aboutLinkDesktop")?.addEventListener("click", (e) => { e.preventDefault(); showAboutModal(); });
+        document.getElementById("slmInfoLinkDesktop")?.addEventListener("click", (e) => { e.preventDefault(); showSLMInfoModal(); });
+        document.getElementById("privacyLinkMobile")?.addEventListener("click", (e) => { e.preventDefault(); showPrivacyModal(); });
+        document.getElementById("termsLinkMobile")?.addEventListener("click", (e) => { e.preventDefault(); showTermsModal(); });
+        document.getElementById("aboutLinkMobile")?.addEventListener("click", (e) => { e.preventDefault(); showAboutModal(); });
+        document.getElementById("slmInfoLinkMobile")?.addEventListener("click", (e) => { e.preventDefault(); showSLMInfoModal(); });
+        document.getElementById("cookiesLinkDesktop")?.addEventListener("click", (e) => { e.preventDefault(); showModal("Cookies", "Usamos cookies para melhorar sua experiência.", null, false); });
+        document.getElementById("cookiesLinkMobile")?.addEventListener("click", (e) => { e.preventDefault(); showModal("Cookies", "Usamos cookies para melhorar sua experiência.", null, false); });
+        
+        window.closeModal = closeModal; window.purchasePlan = purchasePlan;
+    })();
 </script>
 </body>
 </html>
