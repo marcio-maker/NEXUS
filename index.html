@@ -2660,62 +2660,6 @@
                 }
             }
 
-            // 6. ATALHOS DE TECLADO
-            function initKeyboardShortcuts() {
-                document.addEventListener("keydown", (e) => {
-                    // Ctrl+K ou Cmd+K - foco na busca
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-                        e.preventDefault();
-                        const searchInput = document.getElementById("searchInput");
-                        if (searchInput) {
-                            searchInput.focus();
-                            showToast("🔍 Busca ativada", "info");
-                        }
-                    }
-
-                    // Ctrl+D - dashboard
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
-                        e.preventDefault();
-                        showView("dashboard");
-                        showToast("📊 Dashboard", "info");
-                    }
-
-                    // Ctrl+M - marketplace (browse)
-                    if ((e.ctrlKey || e.metaKey) && e.key === 'm') {
-                        e.preventDefault();
-                        showView("browse");
-                        showToast("🏪 Marketplace", "info");
-                    }
-
-                    // Ctrl+T - tokens
-                    if ((e.ctrlKey || e.metaKey) && e.key === 't') {
-                        e.preventDefault();
-                        showView("tokens");
-                        showToast("💰 Seus tokens", "info");
-                    }
-
-                    // Escape - fechar modais
-                    if (e.key === 'Escape') {
-                        document.querySelectorAll(".modal").forEach(modal => {
-                            if (modal.style.display === "flex") modal.style.display = "none";
-                        });
-                    }
-
-                    // F11 - modo foco (opcional)
-                    if (e.key === 'F11') {
-                        e.preventDefault();
-                        document.body.classList.toggle("focus-mode");
-                        showToast(document.body.classList.contains("focus-mode") ? "🎯 Modo Foco ativado" : "🎯 Modo Foco desativado", "info");
-                    }
-                });
-
-                // Adicionar dica de teclado
-                const hint = document.createElement("div");
-                hint.className = "keyboard-hint";
-                hint.innerHTML = '<i class="fas fa-keyboard"></i> Ctrl+K: Buscar | Ctrl+D: Dashboard | Ctrl+M: Models | F11: Modo Foco';
-                document.body.appendChild(hint);
-            }
-
             // 7. CONFIRMAÇÃO ANTES DE SAIR
             let hasUnsavedChanges = false;
 
